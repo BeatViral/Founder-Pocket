@@ -8,6 +8,7 @@ import { FieldLabel, Select, Textarea } from "../components/ui/FormControls";
 import {
   createObservationInput,
   desiredOutcomeOptions,
+  exampleObservations,
   generateBusinessScan,
   ideaStateOptions,
   whereNoticedOptions
@@ -85,48 +86,82 @@ export default function ScanPage() {
             Not every observation is a business. Founder Pocket helps you find the ones that might be.
           </p>
         </div>
-      <Card className="p-5 md:p-7">
-        <form className="space-y-5" onSubmit={submit}>
-          <FieldLabel label="What have you noticed?" helper="Write it like you would say it to a friend.">
-            <Textarea
-              required
-              value={observationText}
-              onChange={(event) => setObservationText(event.target.value)}
-              placeholder="I keep noticing that..."
-              className="min-h-40 text-base"
-            />
-          </FieldLabel>
-          <FieldLabel label="Optional context" helper="Add where you saw it, who was involved, or why it stood out.">
-            <Textarea value={optionalContext} onChange={(event) => setOptionalContext(event.target.value)} />
-          </FieldLabel>
-          <div className="grid gap-4 md:grid-cols-3">
-            <FieldLabel label="Where did you notice it?">
-              <Select value={whereNoticed} onChange={(event) => setWhereNoticed(event.target.value as WhereNoticed)}>
-                {whereNoticedOptions.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
-              </Select>
+        <Card className="p-5 md:p-7">
+          <form className="space-y-5" onSubmit={submit}>
+            <FieldLabel label="What have you noticed?" helper="Write it like you would say it to a friend.">
+              <Textarea
+                required
+                value={observationText}
+                onChange={(event) => setObservationText(event.target.value)}
+                placeholder="I keep noticing that..."
+                className="min-h-40 text-base"
+              />
             </FieldLabel>
-            <FieldLabel label="Do you already have an idea?">
-              <Select value={ideaState} onChange={(event) => setIdeaState(event.target.value as IdeaState)}>
-                {ideaStateOptions.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
-              </Select>
+            <FieldLabel label="Optional context" helper="Add where you saw it, who was involved, or why it stood out.">
+              <Textarea value={optionalContext} onChange={(event) => setOptionalContext(event.target.value)} />
             </FieldLabel>
-            <FieldLabel label="What do you want from this?">
-              <Select value={desiredOutcome} onChange={(event) => setDesiredOutcome(event.target.value as DesiredOutcome)}>
-                {desiredOutcomeOptions.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
-              </Select>
-            </FieldLabel>
+            <div className="grid gap-4 md:grid-cols-3">
+              <FieldLabel label="Where did you notice it?">
+                <Select value={whereNoticed} onChange={(event) => setWhereNoticed(event.target.value as WhereNoticed)}>
+                  {whereNoticedOptions.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </Select>
+              </FieldLabel>
+              <FieldLabel label="Do you already have an idea?">
+                <Select value={ideaState} onChange={(event) => setIdeaState(event.target.value as IdeaState)}>
+                  {ideaStateOptions.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </Select>
+              </FieldLabel>
+              <FieldLabel label="What do you want from this?">
+                <Select value={desiredOutcome} onChange={(event) => setDesiredOutcome(event.target.value as DesiredOutcome)}>
+                  {desiredOutcomeOptions.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </Select>
+              </FieldLabel>
+            </div>
+            <Button type="submit" fullWidth>
+              Scan for Business
+            </Button>
+          </form>
+        </Card>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {[
+            ["1", "Type something you noticed"],
+            ["2", "Get business angles"],
+            ["3", "Turn the best one into a startup dossier"]
+          ].map(([step, label]) => (
+            <div key={step} className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
+              <div className="mb-3 grid h-8 w-8 place-items-center rounded-md bg-signal text-sm font-black text-slate-950">
+                {step}
+              </div>
+              <p className="text-sm font-semibold text-slate-100">{label}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 rounded-lg border border-white/10 bg-white/[0.05] p-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-sm font-bold text-white">Try example</h2>
+            <span className="text-xs text-slate-400">Tap one, then scan it.</span>
           </div>
-          <Button type="submit" fullWidth>
-            Scan for Business
-          </Button>
-        </form>
-      </Card>
+          <div className="flex flex-wrap gap-2">
+            {exampleObservations.slice(0, 6).map((example) => (
+              <button
+                key={example}
+                type="button"
+                onClick={() => setObservationText(example)}
+                className="rounded-full border border-white/12 bg-slate-950/60 px-3 py-1.5 text-xs text-slate-300 transition hover:border-signal/60 hover:text-white"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
+        </div>
       </section>
     </main>
   );

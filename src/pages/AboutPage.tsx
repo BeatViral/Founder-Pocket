@@ -12,7 +12,7 @@ export default function AboutPage() {
         <Card tone="light" className="p-6">
           <h2 className="text-2xl font-bold text-slate-950">The front door is curiosity.</h2>
           <p className="mt-3 leading-7 text-slate-600">
-            You do not need a startup idea, investor language, or a pitch deck. You start with
+            You do not need a startup idea, business jargon, or a pitch deck. You start with
             something you noticed in work, life, customers, hobbies, health, music, local business,
             or the world around you.
           </p>

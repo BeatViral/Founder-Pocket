@@ -23,7 +23,8 @@ export function ShareModal({
     const shareLink = await shareService.createShareLink(dossier.id, mode);
     if (!shareLink) return;
     const path = mode === "full" ? `/share/${shareLink.shareToken}` : `/share/${shareLink.shareToken}/${mode}`;
-    const url = `${window.location.origin}${path}`;
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+    const url = `${window.location.origin}${basePath}${path}`;
     setLink(url);
     await navigator.clipboard.writeText(url);
     const refreshed = await shareService.getSharedDossier(shareLink.shareToken);
@@ -34,6 +35,9 @@ export function ShareModal({
     <Modal open={open} title="Share dossier" onClose={onClose}>
       <p className="mb-4 text-sm leading-6 text-slate-300">
         Only share information you are comfortable making visible.
+      </p>
+      <p className="mb-4 rounded-md border border-amber-300/20 bg-amber-400/10 p-3 text-sm leading-6 text-amber-100">
+        Demo share links are stored locally. Real public links require backend storage.
       </p>
       <div className="grid gap-2 sm:grid-cols-2">
         {(Object.keys(shareModeLabels) as ShareMode[]).map((item) => (

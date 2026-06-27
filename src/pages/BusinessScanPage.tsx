@@ -1,4 +1,4 @@
-import { ArrowRight, Download, FileText, Lightbulb, Save } from "lucide-react";
+import { ArrowRight, Download, Lightbulb, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { BusinessAngleCard } from "../components/scan/BusinessAngleCard";
@@ -137,8 +137,8 @@ export default function BusinessScanPage() {
             <Button className="mt-4" fullWidth icon={<ArrowRight size={16} />} onClick={() => navigate(`/proof-check/${scan.id}?angle=${scan.angles[0].id}`)}>
               Run proof check
             </Button>
-            <Button className="mt-2" fullWidth variant="secondary" icon={<FileText size={16} />} onClick={() => navigate(`/proof-check/${scan.id}?angle=${scan.angles[0].id}`)}>
-              Generate dossier
+            <Button className="mt-2" fullWidth variant="secondary" icon={<ArrowRight size={16} />} onClick={() => navigate(`/proof-check/${scan.id}?angle=${scan.angles[0].id}`)}>
+              Continue to proof check
             </Button>
           </Card>
         </aside>

@@ -58,13 +58,17 @@ export default function ProofCheckPage() {
     navigate(`/app/dossier/${dossier.id}`);
   };
 
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
+  const requestGenerate = async () => {
     if (!profile) {
       setGateOpen(true);
       return;
     }
     await generate();
+  };
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    await requestGenerate();
   };
 
   return (
@@ -126,6 +130,15 @@ export default function ProofCheckPage() {
                 </div>
               </>
             ) : null}
+          </Card>
+          <Card className="p-5">
+            <h2 className="text-lg font-bold">Generate Dossier</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              After previewing or completing this Proof Check, generate the startup dossier for the selected angle.
+            </p>
+            <Button className="mt-4" fullWidth icon={<FileText size={18} />} onClick={requestGenerate}>
+              Generate Startup Dossier
+            </Button>
           </Card>
         </aside>
       </div>

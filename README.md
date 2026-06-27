@@ -2,7 +2,7 @@
 
 **Type something you've noticed. See if there's a business in it.**
 
-Founder Pocket is an observation-to-business engine. A user can type a plain observation from work, life, customers, hobbies, health, music, education, local business, or the world around them. The app scans for business signals, generates possible business angles, runs a simple proof check, then turns the strongest angle into a startup dossier that can be saved, edited, shared, copied, exported as JSON, or printed to PDF.
+Observation-to-business engine for turning things people notice into business angles, proof checks, startup dossiers, MVP build briefs, and validation plans. Founder Pocket lets a user type a plain observation from work, life, customers, hobbies, health, music, education, local business, or the world around them, then scan it for business signals and decide what to test next.
 
 ## Features
 
@@ -14,7 +14,7 @@ Founder Pocket is an observation-to-business engine. A user can type a plain obs
   - One-page business snapshot
   - Full startup dossier
   - Accelerator-style answers
-  - Investor/advisor FAQ
+  - Advisor FAQ
   - MVP build brief
   - Validation sprint
   - Founder video script
@@ -24,7 +24,7 @@ Founder Pocket is an observation-to-business engine. A user can type a plain obs
 - Startup Readiness Score
 - Dashboard for saved scans and dossiers
 - Editable dossier sections
-- Local share links with full, investor, builder, and accelerator modes
+- Demo share links with full, investor, builder, and accelerator modes
 - Copy actions and JSON download
 - Browser print/save-as-PDF export
 - LocalStorage persistence with service boundaries for a future backend
@@ -104,3 +104,5 @@ Do not expose API keys in the frontend. Use serverless functions or a backend se
 ## Positioning
 
 Founder Pocket does not promise funding, acceptance, or success. It helps turn a real observation into business angles, proof questions, and a serious startup dossier worth improving.
+
+Demo share links are stored locally. Real public links require backend storage.

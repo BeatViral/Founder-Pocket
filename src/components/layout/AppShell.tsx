@@ -13,7 +13,7 @@ export function AppShell() {
             </span>
             <span>
               <span className="block text-sm font-bold">Founder Pocket</span>
-              <span className="block text-xs text-slate-400">Your startup entry room</span>
+              <span className="block text-xs text-slate-400">Observation-to-business workspace</span>
             </span>
           </Link>
           <nav className="flex items-center gap-2">
@@ -22,8 +22,8 @@ export function AppShell() {
                 Dashboard
               </Button>
             </Link>
-            <Link to="/start">
-              <Button icon={<Plus size={16} />}>New Dossier</Button>
+            <Link to="/scan">
+              <Button icon={<Plus size={16} />}>New Scan</Button>
             </Link>
           </nav>
         </div>

@@ -86,8 +86,8 @@ export default function LandingPage() {
           <h2 className="mt-4 text-3xl font-bold text-slate-950">The serious pack comes after the scan.</h2>
           <p className="mt-4 leading-7 text-slate-600">
             Once an angle looks promising, Founder Pocket creates a snapshot, full dossier,
-            accelerator-style answers, advisor FAQ, MVP build brief, validation sprint,
-            video script, outreach email, and share links.
+            structured answers, MVP build brief, validation sprint, video script, outreach email,
+            and share-ready sections.
           </p>
           <Link to="/scan" className="mt-6 inline-flex">
             <Button icon={<ArrowRight size={18} />}>Try a scan</Button>

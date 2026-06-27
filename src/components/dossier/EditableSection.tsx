@@ -1,5 +1,5 @@
 import { Check, Copy, RefreshCw, SquarePen } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { DossierSection as DossierSectionType } from "../../types";
 import { Button } from "../ui/Button";
 import { Markdown } from "../ui/Markdown";
@@ -14,6 +14,11 @@ export function EditableSection({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(section.content);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setEditing(false);
+    setDraft(section.content);
+  }, [section.id, section.content]);
 
   const copy = async () => {
     await navigator.clipboard.writeText(section.content);
