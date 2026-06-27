@@ -1,0 +1,13 @@
+node_modules
+dist
+.DS_Store
+.env
+.env.*
+.agents
+.codex
+.pnpm-store
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+vite.out.log
+vite.err.log
