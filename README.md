@@ -59,7 +59,7 @@ npm run preview
 
 This app is frontend-only and can deploy to Vercel, Netlify, or GitHub Pages.
 
-For GitHub Pages, set the Vite `base` option in `vite.config.ts` if deploying under a repository subpath, then publish the `dist` folder through your preferred Pages workflow.
+GitHub Pages deployment is configured in `.github/workflows/deploy-pages.yml`. The production Vite build uses `/Founder-Pocket/` as its base path, and the workflow publishes the built `dist` folder with an SPA fallback.
 
 ## Future Supabase Setup
 
