@@ -9,8 +9,12 @@ const roleForEmail = (email: string): UserProfile["role"] =>
 export const authService = {
   async currentSession(): Promise<AuthSession | undefined> {
     if (supabaseClient.isConfigured()) {
-      const user = await supabaseClient.currentUser().catch(() => undefined);
+      const user = await supabaseClient.currentUser().catch(async () => {
+        await supabaseClient.signOut().catch(() => undefined);
+        return undefined;
+      });
       if (user) return { user, mode: "backend", token: supabaseClient.session()?.access_token };
+      return undefined;
     }
 
     const backend = await apiClient.auth.me().catch(() => undefined);
@@ -21,16 +25,15 @@ export const authService = {
   },
 
   async signup(value: { name: string; email: string; password?: string }): Promise<AuthSession> {
-    if (supabaseClient.isConfigured() && value.password) {
-      const supabaseUser = await supabaseClient.signUp(value).catch(() => undefined);
-      if (supabaseUser) {
-        const saved = await storageService.saveUserProfile({
-          name: supabaseUser.name,
-          email: supabaseUser.email,
-          role: supabaseUser.role
-        });
-        return { user: saved, mode: "backend", token: supabaseClient.session()?.access_token };
-      }
+    if (supabaseClient.isConfigured()) {
+      if (!value.password) throw new Error("Enter a password to create a Supabase account.");
+      const supabaseUser = await supabaseClient.signUp(value);
+      const saved = await storageService.saveUserProfile({
+        name: supabaseUser.name,
+        email: supabaseUser.email,
+        role: supabaseUser.role
+      });
+      return { user: saved, mode: "backend", token: supabaseClient.session()?.access_token };
     }
 
     const backend = await apiClient.auth.register(value).catch(() => undefined);
@@ -45,16 +48,15 @@ export const authService = {
   },
 
   async login(value: { email: string; password?: string }): Promise<AuthSession> {
-    if (supabaseClient.isConfigured() && value.password) {
-      const supabaseUser = await supabaseClient.signIn(value).catch(() => undefined);
-      if (supabaseUser) {
-        const saved = await storageService.saveUserProfile({
-          name: supabaseUser.name,
-          email: supabaseUser.email,
-          role: supabaseUser.role
-        });
-        return { user: saved, mode: "backend", token: supabaseClient.session()?.access_token };
-      }
+    if (supabaseClient.isConfigured()) {
+      if (!value.password) throw new Error("Enter your password to log in with Supabase.");
+      const supabaseUser = await supabaseClient.signIn(value);
+      const saved = await storageService.saveUserProfile({
+        name: supabaseUser.name,
+        email: supabaseUser.email,
+        role: supabaseUser.role
+      });
+      return { user: saved, mode: "backend", token: supabaseClient.session()?.access_token };
     }
 
     const backend = await apiClient.auth.login(value).catch(() => undefined);

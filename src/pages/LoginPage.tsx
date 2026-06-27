@@ -6,16 +6,28 @@ import { Card } from "../components/ui/Card";
 import { FieldLabel, Input } from "../components/ui/FormControls";
 import { analyticsService } from "../services/analyticsService";
 import { authService } from "../services/authService";
+import { isSupabaseConfigured } from "../services/supabaseClient";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const supabaseMode = isSupabaseConfigured();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    await authService.login({ email, password });
-    navigate("/app/dashboard");
+    setError("");
+    setLoading(true);
+    try {
+      await authService.login({ email, password });
+      navigate("/app/dashboard");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not log in.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const guest = async () => {
@@ -26,19 +38,22 @@ export default function LoginPage() {
   return (
     <main className="mx-auto grid min-h-[72vh] max-w-xl place-items-center px-4 py-12">
       <Card className="w-full p-6">
-        <Badge tone="info">Local account</Badge>
+        <Badge tone="info">{supabaseMode ? "Supabase account" : "Local account"}</Badge>
         <h1 className="mt-4 text-3xl font-black">Log in</h1>
         <p className="mt-2 text-sm leading-6 text-slate-300">
-          Mock auth is active until the backend is connected. Use any email, or include "admin" to open the admin dashboard.
+          {supabaseMode
+            ? "Use the account connected to the Founder Pocket Supabase project."
+            : "Local demo auth is active. Use any email, or include \"admin\" to open the admin dashboard."}
         </p>
         <form className="mt-6 space-y-4" onSubmit={submit}>
           <FieldLabel label="Email">
             <Input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
           </FieldLabel>
           <FieldLabel label="Password">
-            <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+            <Input required={supabaseMode} type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
           </FieldLabel>
-          <Button type="submit" fullWidth>Log in</Button>
+          {error ? <p className="rounded-md border border-rose-300/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">{error}</p> : null}
+          <Button type="submit" fullWidth disabled={loading}>{loading ? "Logging in..." : "Log in"}</Button>
         </form>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
           <button type="button" onClick={guest} className="text-slate-300 hover:text-white">

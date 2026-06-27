@@ -166,15 +166,19 @@ const localStorageService = {
 };
 
 async function withFallback<T>(supabaseCall: () => Promise<T>, localCall: () => Promise<T>): Promise<T> {
-  if (isSupabaseConfigured()) {
-    try {
-      return await supabaseCall();
-    } catch (error) {
-      console.warn("Supabase unavailable, using local demo storage.", error);
-    }
+  if (!isSupabaseConfigured()) {
+    return localCall();
   }
 
-  return localCall();
+  try {
+    return await supabaseCall();
+  } catch (error) {
+    if (error instanceof Error && /session missing/i.test(error.message)) {
+      console.warn("No Supabase session, using local demo storage.", error);
+      return localCall();
+    }
+    throw error;
+  }
 }
 
 export const storageService = {

@@ -18,6 +18,11 @@ type SupabaseSession = {
   };
 };
 
+type SupabaseAuthResponse = Partial<SupabaseSession> & {
+  session?: SupabaseSession | null;
+  user?: SupabaseSession["user"];
+};
+
 const hasRealKey = (value: string) => Boolean(value && !/PASTE_|YOUR_|placeholder/i.test(value));
 
 export const isSupabaseConfigured = () =>
@@ -96,7 +101,7 @@ export const supabaseClient = {
   },
 
   async signUp(value: { name: string; email: string; password?: string }) {
-    const result = await request<{ access_token?: string; refresh_token?: string; user?: SupabaseSession["user"] }>(
+    const result = await request<SupabaseAuthResponse>(
       "/auth/v1/signup",
       {
         method: "POST",
@@ -108,12 +113,17 @@ export const supabaseClient = {
       },
       false
     );
-    const session: SupabaseSession = {
+    const session = result.session ?? {
       access_token: result.access_token ?? "",
       refresh_token: result.refresh_token,
       user: result.user
     };
-    if (session.access_token) writeSession(session);
+
+    if (!session.access_token) {
+      throw new Error("Account created. Check your email to confirm it, then log in.");
+    }
+
+    writeSession(session);
     return toUserProfile(session);
   },
 
