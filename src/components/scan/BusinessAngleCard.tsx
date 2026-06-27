@@ -30,10 +30,14 @@ export function BusinessAngleCard({
           <dt className="font-semibold text-slate-950">First version</dt>
           <dd className="mt-1 text-slate-600">{angle.firstVersion}</dd>
         </div>
+        <div>
+          <dt className="font-semibold text-slate-950">Recommended test</dt>
+          <dd className="mt-1 text-slate-600">{angle.recommendedNextStep}</dd>
+        </div>
         <div className="grid grid-cols-3 gap-2 pt-1">
           <Metric label="Difficulty" value={angle.difficulty} />
           <Metric label="Risk" value={angle.risk} />
-          <Metric label="Fit" value={angle.founderFit} />
+          <Metric label="Founder fit" value={angle.founderFit} />
         </div>
       </dl>
       <div className="mt-auto flex flex-wrap gap-2 pt-5">

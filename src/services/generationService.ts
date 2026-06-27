@@ -42,7 +42,7 @@ export const desiredOutcomeOptions = [
   "Find a business angle",
   "Create a startup plan",
   "Build something",
-  "Prepare something to send or pitch"
+  "Prepare something to share"
 ] as const;
 
 export const exampleObservations = [
@@ -480,7 +480,7 @@ function founderSpecificAngle(input: ObservationInput): BusinessAngle | undefine
       74,
       4,
       8,
-      "Pitch 5 paid pilot conversations and document price objections."
+      "Ask 5 likely buyers about a paid pilot and document price objections."
     );
   }
 
@@ -753,7 +753,26 @@ export function generateOneLiner(angle: BusinessAngle) {
 
 const list = (items: string[]) => items.map((item) => `- ${item}`).join("\n");
 
-function snapshot(scan: BusinessScan, angle: BusinessAngle, answers: ProofCheckAnswer[]) {
+function dossierToneGuidance(engine: ReturnType<typeof analyzeFounderFitEngine>) {
+  const guidance: Record<ReturnType<typeof analyzeFounderFitEngine>["communicationStyle"], string> = {
+    plain: "Keep the dossier plain, concrete, and low-pressure. Lead with proof questions and simple next steps.",
+    technical: "Make the dossier precise about workflow, prototype scope, data objects, integrations, and technical unknowns.",
+    structured: "Use clear headings, evidence thresholds, decision rules, and measurable validation milestones.",
+    narrative: "Lead with the lived observation, founder story, audience signal, and why this problem keeps showing up.",
+    commercial: "Emphasize buyer urgency, budget owner, price test, paid pilot path, and objection evidence.",
+    practical: "Keep the dossier operational: workflow, current workaround, time saved, first pilot, and weekly proof rhythm.",
+    "founder-authentic": "Use a direct founder voice while separating personal conviction from customer evidence."
+  };
+
+  return guidance[engine.communicationStyle];
+}
+
+function snapshot(
+  scan: BusinessScan,
+  angle: BusinessAngle,
+  answers: ProofCheckAnswer[],
+  engine: ReturnType<typeof analyzeFounderFitEngine>
+) {
   return `# ${angle.name}
 
 ${angle.oneLineDescription}
@@ -776,6 +795,16 @@ ${scan.whyItMayMatter}
 ## First wedge
 ${answerById(answers, "smallest_version", angle.firstVersion)}
 
+## Founder fit
+Score: ${engine.fitScore}/100
+
+Why this fits: ${engine.adaptation.angleStrategy}
+
+Recommended founder path: ${engine.validationPath}
+
+## Dossier tone
+${dossierToneGuidance(engine)}
+
 ## Business model
 ${angle.businessType} with a narrow paid pilot, subscription, service package, or usage-based path depending on the buyer.
 
@@ -789,59 +818,73 @@ ${answerById(answers, "what_proves_real", "Missing proof includes urgency, willi
 ${angle.recommendedNextStep}`;
 }
 
-function fullDossier(scan: BusinessScan, angle: BusinessAngle, answers: ProofCheckAnswer[]) {
+function fullDossier(
+  scan: BusinessScan,
+  angle: BusinessAngle,
+  answers: ProofCheckAnswer[],
+  engine: ReturnType<typeof analyzeFounderFitEngine>
+) {
   return `## 1. Executive Summary
 ${angle.name} is a business worth exploring from the observation: "${scan.observationInput.observationText}" ${angle.oneLineDescription}
 
-## 2. Original Observation
+## 2. Founder Fit Lens
+Founder Fit Score: ${engine.fitScore}/100
+
+Why this fits: ${engine.adaptation.angleStrategy}
+
+Recommended founder path: ${engine.validationPath}
+
+Dossier tone: ${dossierToneGuidance(engine)}
+
+## 3. Original Observation
 ${scan.observationInput.observationText}
 
-## 3. Business Insight
+## 4. Business Insight
 ${scan.interpretation}
 
-## 4. Problem or Opportunity
+## 5. Problem or Opportunity
 ${answerById(answers, "cost", "The opportunity is to reduce repeated pain, wasted time, confusion, risk, or manual effort.")}
 
-## 5. Target Customer
+## 6. Target Customer
 ${answerById(answers, "who_cares", angle.whoItHelps)}
 
-## 6. Current Workarounds
+## 7. Current Workarounds
 ${answerById(answers, "current_workaround", scan.currentWorkaround)}
 
-## 7. Product Thesis
+## 8. Product Thesis
 ${angle.oneLineDescription} The product should begin with one narrow workflow and avoid acting like a full platform too early.
 
-## 8. Founder-Market Fit
+## 9. Founder-Market Fit
 ${answerById(answers, "founder_background", "Founder-market fit still needs a sharper explanation of lived experience, customer access, and unfair insight.")}
 
-## 9. Founder Psychology
+## 10. Founder Psychology
 ${answerById(answers, "founder_motivation", "Founder motivation and operating style still need to be made explicit.")}
 
-## 10. First Wedge
+## 11. First Wedge
 ${answerById(answers, "smallest_version", angle.firstVersion)}
 
-## 11. Market Opportunity
+## 12. Market Opportunity
 Start with the narrow group that feels the pain most often. If usage and payment are proven, expand into adjacent workflows or nearby customer segments.
 
-## 12. Competitive Landscape
+## 13. Competitive Landscape
 The first competitors are current workarounds, generic tools, internal habits, and status quo behavior.
 
-## 13. Business Model
+## 14. Business Model
 ${angle.whoMightPay} could pay through a subscription, paid pilot, service package, or per-workflow fee if the product saves time, reduces risk, or improves outcomes.
 
-## 14. MVP Scope
+## 15. MVP Scope
 ${angle.firstVersion}
 
-## 15. Go-To-Market Plan
+## 16. Go-To-Market Plan
 Start founder-led. Contact the first 5 to 10 people most likely to react, show the smallest version, and ask what would make it worth paying for.
 
-## 16. Validation Plan
+## 17. Validation Plan
 Talk to target users, test a landing page, show a mockup, offer a concierge version, and ask for a paid pilot or concrete commitment.
 
-## 17. Risks and Assumptions
+## 18. Risks and Assumptions
 ${answerById(answers, "could_be_wrong", "The idea could be wrong if the pain is not frequent, not urgent, or not tied to a buyer.")}
 
-## 18. Next 30 Days
+## 19. Next 30 Days
 ${angle.recommendedNextStep}`;
 }
 
@@ -934,7 +977,7 @@ function pathPlan(path: ReturnType<typeof analyzeFounderFitEngine>["validationPa
     "interview-first": ["Send 10 direct interview requests", "Run 5 discovery calls", "Extract exact words and current workarounds"],
     "prototype-first": ["Build a clickable or lightweight prototype", "Watch 5 users try it", "Log technical unknowns and must-have workflow steps"],
     "audience-first": ["Publish the observation", "Collect replies and signups", "Invite the warmest responders into a manual proof sprint"],
-    "client-first": ["Package a narrow paid pilot", "Pitch 5 likely buyers", "Record price objections and commitment signals"],
+    "client-first": ["Package a narrow paid pilot", "Ask 5 likely buyers for a concrete reaction", "Record price objections and commitment signals"],
     "expert-first": ["Interview 5 domain peers", "Map insider workflow constraints", "Ask one trusted expert to review the first wedge"],
     "email-first": ["Send 5 low-pressure messages", "Ask one concrete question", "Use replies to choose the next proof step"]
   };
@@ -1312,8 +1355,8 @@ export function generateStartupDossier(
   const startupName = generateStartupName(scan, selectedAngle);
   const now = new Date().toISOString();
   const sections: DossierSection[] = [
-    section("snapshot", "One-page Business Snapshot", snapshot(scan, selectedAngle, proofAnswers), 1),
-    section("full_dossier", "Full Startup Dossier", fullDossier(scan, selectedAngle, proofAnswers), 2),
+    section("snapshot", "One-page Business Snapshot", snapshot(scan, selectedAngle, proofAnswers, founderFitEngine), 1),
+    section("full_dossier", "Full Startup Dossier", fullDossier(scan, selectedAngle, proofAnswers, founderFitEngine), 2),
     section("founder_fit_engine", "Founder Fit Engine", founderFitEngineSection(founderFitEngine), 3),
     section("founder_market_fit", "Founder-Market Fit", founderMarketFitSection(founderMarketFit), 4),
     section("founder_psychology", "Founder Psychology", founderPsychologySection(founderPsychology), 5),

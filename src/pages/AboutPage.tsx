@@ -12,7 +12,7 @@ export default function AboutPage() {
         <Card tone="light" className="p-6">
           <h2 className="text-2xl font-bold text-slate-950">The front door is curiosity.</h2>
           <p className="mt-3 leading-7 text-slate-600">
-            You do not need a startup idea, business jargon, or a pitch deck. You start with
+            You do not need a startup idea or business jargon. You start with
             something you noticed in work, life, customers, hobbies, health, music, local business,
             or the world around you.
           </p>
@@ -26,9 +26,15 @@ export default function AboutPage() {
         </Card>
       </div>
       <Card className="mt-8 p-6">
+        <h2 className="text-2xl font-bold">Founder fit matters</h2>
+        <p className="mt-3 max-w-3xl leading-7 text-slate-300">
+          Founder Pocket doesn't just analyse the idea. It analyses whether this is the right opportunity for you.
+        </p>
+      </Card>
+      <Card className="mt-5 p-6">
         <h2 className="text-2xl font-bold">What it is not</h2>
         <p className="mt-3 max-w-3xl leading-7 text-slate-300">
-          It is not a funding promise, not a random idea generator, and not a claim that every
+          It is not a success promise, not a random idea generator, and not a claim that every
           observation should become a company. It is a structured way to ask: is there a real
           problem, a specific customer, a buyer, a small first version, and proof worth collecting?
         </p>

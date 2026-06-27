@@ -2,7 +2,9 @@
 
 **Type something you've noticed. See if there's a business in it.**
 
-Observation-to-business engine for turning things people notice into business angles, proof checks, startup dossiers, MVP build briefs, and validation plans. Founder Pocket turns what you've noticed into business ideas that fit who you are, then helps you proof-check the strongest one and turn it into a startup dossier you can save, share, build from, or pitch.
+Observation-to-business engine for turning things people notice into business angles, proof checks, startup dossiers, MVP build briefs, and validation plans.
+
+Founder Pocket doesn't just analyse the idea. It analyses whether this is the right opportunity for you.
 
 ## Features
 
@@ -114,6 +116,6 @@ Do not expose API keys in the frontend. Use serverless functions or a backend se
 
 ## Positioning
 
-Founder Pocket does not promise funding, acceptance, or success. It helps turn a real observation into business angles, proof questions, and a serious startup dossier worth improving.
+Founder Pocket does not promise acceptance or success. It helps turn a real observation into business angles, proof questions, and a serious startup dossier worth improving.
 
 Demo share links are stored locally. Real public links require backend storage.

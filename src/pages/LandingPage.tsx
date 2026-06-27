@@ -19,7 +19,7 @@ export default function LandingPage() {
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
               Founder Pocket turns everyday observations, patterns, frustrations, gaps,
-              habits, and ideas into business angles you can explore, test, build, or pitch.
+              habits, and ideas into business angles you can explore, proof-check, validate, and build from.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link to="/scan">
@@ -31,6 +31,9 @@ export default function LandingPage() {
             </div>
             <p className="mt-5 text-sm text-slate-400">
               Not every observation is a business. Founder Pocket helps you find the ones that might be.
+            </p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
+              Founder Pocket doesn't just analyse the idea. It analyses whether this is the right opportunity for you.
             </p>
           </div>
           <HeroObservationInput />

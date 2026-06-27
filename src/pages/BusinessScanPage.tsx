@@ -1,6 +1,7 @@
 import { ArrowRight, Download, Lightbulb, Save } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { FounderFitCard } from "../components/founder/FounderFitCard";
 import { BusinessAngleCard } from "../components/scan/BusinessAngleCard";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
@@ -8,6 +9,7 @@ import { Card } from "../components/ui/Card";
 import { SaveGate, useUserProfile } from "../components/ui/SaveGate";
 import { ScoreBar } from "../components/ui/ScoreBar";
 import { statusTone } from "../lib/format";
+import { analyzeFounderFitEngine } from "../services/scoringService";
 import { storageService } from "../services/storageService";
 import type { BusinessScan } from "../types";
 
@@ -22,6 +24,11 @@ export default function BusinessScanPage() {
   useEffect(() => {
     if (id) storageService.getScan(id).then(setScan);
   }, [id]);
+
+  const founderFit = useMemo(
+    () => (scan?.angles[0] ? analyzeFounderFitEngine(scan.observationInput, scan.angles[0], []) : undefined),
+    [scan]
+  );
 
   if (!scan) {
     return <NotFound label="Scan not found" />;
@@ -102,7 +109,9 @@ export default function BusinessScanPage() {
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-bold">Suggested business angles</h2>
-                <p className="mt-1 text-sm text-slate-400">Pick one to run through proof check.</p>
+                <p className="mt-1 text-sm text-slate-400">
+                  Ranked by business signal, first-version clarity, and founder fit. Pick one to run through proof check.
+                </p>
               </div>
               <Link to="/scan">
                 <Button variant="secondary">Scan another</Button>
@@ -134,6 +143,7 @@ export default function BusinessScanPage() {
               <SignalList title="Missing proof" items={scan.potentialScore.missingProof} />
             </div>
           </Card>
+          <FounderFitCard profile={founderFit} compact />
           <Card className="p-5">
             <h2 className="font-bold">Recommended next step</h2>
             <p className="mt-2 text-sm leading-6 text-slate-300">{scan.potentialScore.recommendedNextStep}</p>

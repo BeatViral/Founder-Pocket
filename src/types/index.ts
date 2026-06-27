@@ -21,7 +21,7 @@ export type DesiredOutcome =
   | "Find a business angle"
   | "Create a startup plan"
   | "Build something"
-  | "Prepare something to send or pitch";
+  | "Prepare something to share";
 
 export type SignalType =
   | "Repeated behaviour"

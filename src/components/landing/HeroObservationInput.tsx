@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import type { FormEvent } from "react";
+import { Fragment } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { exampleObservations } from "../../services/generationService";
@@ -8,6 +9,12 @@ import { Button } from "../ui/Button";
 export function HeroObservationInput() {
   const navigate = useNavigate();
   const [observation, setObservation] = useState("");
+  const flowSteps = [
+    "Type an observation",
+    "Get business angles",
+    "Proof-check the best one",
+    "Generate a startup dossier"
+  ];
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -40,6 +47,16 @@ export function HeroObservationInput() {
             {item}
           </button>
         ))}
+      </div>
+      <div className="mt-4 rounded-md border border-white/10 bg-slate-950/45 p-3">
+        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-300">
+          {flowSteps.map((step, index) => (
+            <Fragment key={step}>
+              <span className="rounded-md bg-white/[0.06] px-2.5 py-1.5">{step}</span>
+              {index < flowSteps.length - 1 ? <ArrowRight className="text-slate-500" size={14} /> : null}
+            </Fragment>
+          ))}
+        </div>
       </div>
     </form>
   );

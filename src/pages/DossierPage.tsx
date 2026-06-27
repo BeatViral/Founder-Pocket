@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { EditableSection } from "../components/dossier/EditableSection";
 import { ShareModal } from "../components/dossier/ShareModal";
 import { ValidationTracker } from "../components/dossier/ValidationTracker";
+import { FounderFitCard } from "../components/founder/FounderFitCard";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -154,14 +155,10 @@ export default function DossierPage() {
               <ScoreBar value={dossier.readinessScore.total} label={dossier.readinessScore.label} />
             </div>
           </Card>
-          {dossier.founderFitEngine || dossier.founderMarketFit || dossier.founderPsychology ? (
+          <FounderFitCard profile={dossier.founderFitEngine} compact />
+          {dossier.founderMarketFit || dossier.founderPsychology ? (
             <Card className="p-5">
-              <h2 className="font-bold">Founder engine</h2>
-              {dossier.founderFitEngine ? (
-                <div className="mt-4">
-                  <ScoreBar value={dossier.founderFitEngine.fitScore} label={dossier.founderFitEngine.label} />
-                </div>
-              ) : null}
+              <h2 className="font-bold">Founder evidence</h2>
               {dossier.founderMarketFit ? (
                 <div className="mt-4">
                   <ScoreBar value={dossier.founderMarketFit.total} label={dossier.founderMarketFit.label} />

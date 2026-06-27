@@ -87,6 +87,9 @@ export default function ScanPage() {
           <p className="mt-4 text-sm text-slate-400">
             Not every observation is a business. Founder Pocket helps you find the ones that might be.
           </p>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400">
+            Founder Pocket doesn't just analyse the idea. It analyses whether this is the right opportunity for you.
+          </p>
         </div>
         <Card className="p-5 md:p-7">
           <form className="space-y-5" onSubmit={submit}>
@@ -141,11 +144,12 @@ export default function ScanPage() {
           </form>
         </Card>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <div className="mt-5 grid gap-3 md:grid-cols-4">
           {[
-            ["1", "Type something you noticed"],
+            ["1", "Type an observation"],
             ["2", "Get business angles"],
-            ["3", "Turn the best one into a startup dossier"]
+            ["3", "Proof-check the best one"],
+            ["4", "Generate a startup dossier"]
           ].map(([step, label]) => (
             <div key={step} className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
               <div className="mb-3 grid h-8 w-8 place-items-center rounded-md bg-signal text-sm font-black text-slate-950">
