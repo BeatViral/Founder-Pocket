@@ -1,21 +1,20 @@
-import { Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
-import { FieldLabel, Select, Textarea } from "../components/ui/FormControls";
+import { FieldLabel, Input, Select, Textarea } from "../components/ui/FormControls";
 import {
   createObservationInput,
   desiredOutcomeOptions,
   exampleObservations,
   generateBusinessScan,
-  ideaStateOptions,
   whereNoticedOptions
 } from "../services/generationService";
 import { storageService } from "../services/storageService";
 import { analyticsService } from "../services/analyticsService";
-import type { DesiredOutcome, IdeaState, WhereNoticed } from "../types";
+import type { DesiredOutcome, WhereNoticed } from "../types";
 
 type LocationState = { observationText?: string };
 
@@ -24,10 +23,12 @@ export default function ScanPage() {
   const location = useLocation();
   const state = location.state as LocationState | null;
   const [observationText, setObservationText] = useState(state?.observationText ?? "");
-  const [optionalContext, setOptionalContext] = useState("");
-  const [whereNoticed, setWhereNoticed] = useState<WhereNoticed>("Work");
-  const [ideaState, setIdeaState] = useState<IdeaState>("No, just checking");
-  const [desiredOutcome, setDesiredOutcome] = useState<DesiredOutcome>("Just scan for possibilities");
+  const [whereNoticed, setWhereNoticed] = useState<WhereNoticed | "">("");
+  const [whoAffected, setWhoAffected] = useState("");
+  const [currentWorkaround, setCurrentWorkaround] = useState("");
+  const [personalExperience, setPersonalExperience] = useState("");
+  const [desiredOutcome, setDesiredOutcome] = useState<DesiredOutcome | "">("");
+  const [showOptionalContext, setShowOptionalContext] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -40,14 +41,26 @@ export default function ScanPage() {
     event.preventDefault();
     if (!observationText.trim()) return;
     setLoading(true);
+    const contextParts = [
+      whoAffected.trim() ? `Who is affected: ${whoAffected.trim()}` : "",
+      currentWorkaround.trim() ? `What people do now: ${currentWorkaround.trim()}` : "",
+      personalExperience.trim() ? `Own experience: ${personalExperience.trim()}` : ""
+    ].filter(Boolean);
+    const normalizedWhereNoticed = whereNoticed || "Other";
+    const normalizedDesiredOutcome = desiredOutcome || "Just scan for possibilities";
     const input = createObservationInput({
       observationText,
-      optionalContext,
-      whereNoticed,
-      ideaState,
-      desiredOutcome
+      optionalContext: contextParts.join("\n"),
+      founderContext: personalExperience.trim(),
+      whereNoticed: normalizedWhereNoticed,
+      ideaState: "No, just checking",
+      desiredOutcome: normalizedDesiredOutcome
     });
-    await analyticsService.track("observation_submitted", { whereNoticed, desiredOutcome });
+    await analyticsService.track("observation_submitted", {
+      whereNoticed: normalizedWhereNoticed,
+      desiredOutcome: normalizedDesiredOutcome,
+      optionalContextAdded: contextParts.length > 0
+    });
     const scan = generateBusinessScan(input);
     await storageService.saveScan(scan);
     await analyticsService.track("scan_generated", { scanId: scan.id, status: scan.status });
@@ -91,44 +104,66 @@ export default function ScanPage() {
         </div>
         <Card className="p-5 md:p-7">
           <form className="space-y-5" onSubmit={submit}>
-            <FieldLabel label="What have you noticed?" helper="Write it like you would say it to a friend.">
+            <FieldLabel label="What have you noticed?">
               <Textarea
                 required
                 value={observationText}
                 onChange={(event) => setObservationText(event.target.value)}
-                placeholder="I keep noticing that..."
-                className="min-h-40 text-base"
+                placeholder="I keep noticing that…"
+                className="min-h-52 text-base"
               />
             </FieldLabel>
-            <FieldLabel label="Optional context" helper="Add where you saw it, who was involved, or why it stood out.">
-              <Textarea value={optionalContext} onChange={(event) => setOptionalContext(event.target.value)} />
-            </FieldLabel>
-            <div className="grid gap-4 md:grid-cols-3">
-              <FieldLabel label="Where did you notice it?">
-                <Select value={whereNoticed} onChange={(event) => setWhereNoticed(event.target.value as WhereNoticed)}>
-                  {whereNoticedOptions.map((option) => (
-                    <option key={option}>{option}</option>
-                  ))}
-                </Select>
-              </FieldLabel>
-              <FieldLabel label="Do you already have an idea?">
-                <Select value={ideaState} onChange={(event) => setIdeaState(event.target.value as IdeaState)}>
-                  {ideaStateOptions.map((option) => (
-                    <option key={option}>{option}</option>
-                  ))}
-                </Select>
-              </FieldLabel>
-              <FieldLabel label="What do you want from this?">
-                <Select value={desiredOutcome} onChange={(event) => setDesiredOutcome(event.target.value as DesiredOutcome)}>
-                  {desiredOutcomeOptions.map((option) => (
-                    <option key={option}>{option}</option>
-                  ))}
-                </Select>
-              </FieldLabel>
-            </div>
             <Button type="submit" fullWidth>
               Scan for Business
             </Button>
+            <div className="rounded-md border border-white/10 bg-slate-950/35">
+              <button
+                type="button"
+                onClick={() => setShowOptionalContext((open) => !open)}
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-100"
+              >
+                <span>Optional: add context</span>
+                <ChevronDown
+                  size={18}
+                  className={`shrink-0 text-slate-400 transition ${showOptionalContext ? "rotate-180" : ""}`}
+                />
+              </button>
+              {showOptionalContext ? (
+                <div className="grid gap-4 border-t border-white/10 p-4 md:grid-cols-2">
+                  <FieldLabel label="Where did you notice this?">
+                    <Select value={whereNoticed} onChange={(event) => setWhereNoticed(event.target.value as WhereNoticed | "")}>
+                      <option value="">Choose if useful</option>
+                      {whereNoticedOptions.map((option) => (
+                        <option key={option}>{option}</option>
+                      ))}
+                    </Select>
+                  </FieldLabel>
+                  <FieldLabel label="Who is affected?">
+                    <Input value={whoAffected} onChange={(event) => setWhoAffected(event.target.value)} placeholder="Patients, parents, tradies, creators..." />
+                  </FieldLabel>
+                  <FieldLabel label="What do people do now?">
+                    <Textarea value={currentWorkaround} onChange={(event) => setCurrentWorkaround(event.target.value)} className="min-h-24" />
+                  </FieldLabel>
+                  <FieldLabel label="Is this from your own experience?">
+                    <Select value={personalExperience} onChange={(event) => setPersonalExperience(event.target.value)}>
+                      <option value="">Choose if useful</option>
+                      <option>Yes, I have seen this myself</option>
+                      <option>Yes, through people I know or work with</option>
+                      <option>Not sure yet</option>
+                      <option>No, it is a wider pattern I noticed</option>
+                    </Select>
+                  </FieldLabel>
+                  <FieldLabel label="What kind of outcome are you looking for?">
+                    <Select value={desiredOutcome} onChange={(event) => setDesiredOutcome(event.target.value as DesiredOutcome | "")}>
+                      <option value="">Choose if useful</option>
+                      {desiredOutcomeOptions.map((option) => (
+                        <option key={option}>{option}</option>
+                      ))}
+                    </Select>
+                  </FieldLabel>
+                </div>
+              ) : null}
+            </div>
           </form>
         </Card>
 

@@ -86,6 +86,22 @@ const domain = (input: ObservationInput | string) => {
   return "general";
 };
 
+const optionalContextValue = (input: ObservationInput, label: string) => {
+  const prefix = `${label}:`;
+  return input.optionalContext
+    .split(/\r?\n/)
+    .find((line) => line.trim().toLowerCase().startsWith(prefix.toLowerCase()))
+    ?.slice(prefix.length)
+    .trim();
+};
+
+const contextList = (value: string) =>
+  value
+    .split(/,|;|\band\b/i)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
 const angle = (
   name: string,
   oneLineDescription: string,
@@ -526,6 +542,9 @@ function adaptAnglesForFounder(input: ObservationInput, angles: BusinessAngle[])
 }
 
 function affectedGroups(input: ObservationInput) {
+  const provided = optionalContextValue(input, "Who is affected");
+  if (provided) return contextList(provided);
+
   const d = domain(input);
   if (d === "health") return ["Patients", "Small clinics", "Practice managers", "Clinicians"];
   if (d === "music") return ["Independent artists", "Songwriters", "Producers", "Creator schools"];
@@ -536,6 +555,9 @@ function affectedGroups(input: ObservationInput) {
 }
 
 function currentWorkaround(input: ObservationInput) {
+  const provided = optionalContextValue(input, "What people do now");
+  if (provided) return asSentence(provided, provided);
+
   const d = domain(input);
   if (d === "health") return "Phone calls, paper notes, memory, reception reminders, and disconnected clinic systems.";
   if (d === "music") return "DAW projects, hard drives, voice notes, informal producer help, and unfinished folder systems.";
