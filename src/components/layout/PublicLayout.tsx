@@ -12,18 +12,27 @@ export function PublicLayout() {
             </span>
             <span>
               <span className="block text-sm font-bold">Founder Pocket</span>
-              <span className="block text-xs text-slate-400">Investor-entry engine</span>
+              <span className="block text-xs text-slate-400">Observation-to-business engine</span>
             </span>
           </Link>
-          <nav className="flex items-center gap-2">
-            <Link to="/about" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white sm:block">
-              About
+          <nav className="flex items-center gap-1 sm:gap-2">
+            <Link to="/scan" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white md:block">
+              Scan
+            </Link>
+            <Link to="/how-it-works" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white md:block">
+              How it works
+            </Link>
+            <Link to="/about" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white md:block">
+              What it is
+            </Link>
+            <Link to="/examples" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white lg:block">
+              Examples
             </Link>
             <Link to="/app/dashboard">
               <Button variant="secondary">Dashboard</Button>
             </Link>
-            <Link to="/start">
-              <Button>Start</Button>
+            <Link to="/scan">
+              <Button>Scan</Button>
             </Link>
           </nav>
         </div>

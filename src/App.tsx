@@ -15,10 +15,12 @@ export default function App() {
   return (
     <Routes>
       <Route element={<PublicLayout />}>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<ScanPage />} />
         <Route path="/scan" element={<ScanPage />} />
+        <Route path="/how-it-works" element={<LandingPage />} />
         <Route path="/examples" element={<ExamplesPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/start" element={<Navigate to="/scan" replace />} />
       </Route>
       <Route element={<AppShell />}>
         <Route path="/app/dashboard" element={<DashboardPage />} />

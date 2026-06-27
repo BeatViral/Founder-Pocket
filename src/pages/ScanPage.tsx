@@ -1,6 +1,7 @@
 import { Loader2 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { FieldLabel, Select, Textarea } from "../components/ui/FormControls";
@@ -68,14 +69,22 @@ export default function ScanPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-black">What have you noticed?</h1>
-        <p className="mt-3 text-slate-300">
-          It can be from work, life, customers, friends, hobbies, family, travel, music, health,
-          money, culture, local business, or anything you keep seeing.
-        </p>
-      </div>
+    <main className="relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(56,189,248,0.18),transparent_32%),radial-gradient(circle_at_80%_18%,rgba(139,92,246,0.13),transparent_28%)]" />
+      <section className="relative mx-auto max-w-5xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+        <div className="mx-auto mb-8 max-w-3xl text-center">
+          <Badge tone="info">Founder Pocket</Badge>
+          <h1 className="mt-5 text-5xl font-black tracking-tight md:text-7xl">
+            Type something you've noticed. See if there's a business in it.
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+            Start with a plain observation from work, life, customers, hobbies, health, music,
+            education, local business, or the world around you.
+          </p>
+          <p className="mt-4 text-sm text-slate-400">
+            Not every observation is a business. Founder Pocket helps you find the ones that might be.
+          </p>
+        </div>
       <Card className="p-5 md:p-7">
         <form className="space-y-5" onSubmit={submit}>
           <FieldLabel label="What have you noticed?" helper="Write it like you would say it to a friend.">
@@ -118,6 +127,7 @@ export default function ScanPage() {
           </Button>
         </form>
       </Card>
+      </section>
     </main>
   );
 }
