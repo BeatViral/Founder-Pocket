@@ -128,7 +128,17 @@ pnpm db:generate
 pnpm db:migrate
 ```
 
-Supabase project:
+Supabase SQL Editor setup, recommended for the hosted project:
+
+1. Open Supabase Dashboard -> SQL Editor -> New Query.
+2. Paste and run `supabase/sql-editor/01_tables.sql`.
+3. Open another New Query, paste and run `supabase/sql-editor/02_indexes_triggers_rls.sql`.
+4. Open another New Query, paste and run `supabase/sql-editor/03_policies_rpc.sql`.
+5. Check Table Editor for the app tables.
+
+If `02_indexes_triggers_rls.sql` says a relation/table does not exist, `01_tables.sql` did not run successfully from the top.
+
+Supabase CLI option:
 
 ```bash
 supabase login
