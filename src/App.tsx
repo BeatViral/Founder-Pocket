@@ -12,6 +12,7 @@ import ExamplesPage from "./pages/ExamplesPage";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import PricingPage from "./pages/PricingPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import ProofCheckPage from "./pages/ProofCheckPage";
 import ScanPage from "./pages/ScanPage";
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/how-it-works" element={<LandingPage />} />
         <Route path="/examples" element={<ExamplesPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />

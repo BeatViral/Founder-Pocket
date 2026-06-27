@@ -25,6 +25,9 @@ export function PublicLayout() {
             <Link to="/about" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white md:block">
               What it is
             </Link>
+            <Link to="/pricing" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white lg:block">
+              Pricing
+            </Link>
             <Link to="/examples" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white lg:block">
               Examples
             </Link>
