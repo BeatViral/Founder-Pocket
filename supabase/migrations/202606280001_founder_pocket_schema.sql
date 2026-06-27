@@ -253,27 +253,35 @@ alter table public.analytics_events enable row level security;
 alter table public.admin_settings enable row level security;
 alter table public.ai_jobs enable row level security;
 
+drop policy if exists "users manage own profile" on public.users;
 create policy "users manage own profile" on public.users
   for all using (id = auth.uid()::text) with check (id = auth.uid()::text);
 
+drop policy if exists "founder profiles manage own rows" on public.founder_profiles;
 create policy "founder profiles manage own rows" on public.founder_profiles
   for all using (user_id = auth.uid()::text) with check (user_id = auth.uid()::text);
 
+drop policy if exists "observations manage own rows" on public.observations;
 create policy "observations manage own rows" on public.observations
   for all using (user_id = auth.uid()::text) with check (user_id = auth.uid()::text);
 
+drop policy if exists "business scans manage own rows" on public.business_scans;
 create policy "business scans manage own rows" on public.business_scans
   for all using (user_id = auth.uid()::text) with check (user_id = auth.uid()::text);
 
+drop policy if exists "startup dossiers manage own rows" on public.startup_dossiers;
 create policy "startup dossiers manage own rows" on public.startup_dossiers
   for all using (user_id = auth.uid()::text) with check (user_id = auth.uid()::text);
 
+drop policy if exists "analytics insert from anon or users" on public.analytics_events;
 create policy "analytics insert from anon or users" on public.analytics_events
   for insert with check (user_id is null or user_id = auth.uid()::text);
 
+drop policy if exists "analytics read own rows" on public.analytics_events;
 create policy "analytics read own rows" on public.analytics_events
   for select using (user_id is null or user_id = auth.uid()::text);
 
+drop policy if exists "share links manage own dossier links" on public.share_links;
 create policy "share links manage own dossier links" on public.share_links
   for all using (
     exists (
@@ -290,9 +298,11 @@ create policy "share links manage own dossier links" on public.share_links
     )
   );
 
+drop policy if exists "public can read active share links" on public.share_links;
 create policy "public can read active share links" on public.share_links
   for select using (is_active and (expires_at is null or expires_at > now()));
 
+drop policy if exists "public can read shared dossiers" on public.startup_dossiers;
 create policy "public can read shared dossiers" on public.startup_dossiers
   for select using (
     exists (
@@ -303,6 +313,7 @@ create policy "public can read shared dossiers" on public.startup_dossiers
     )
   );
 
+drop policy if exists "public can record share views" on public.share_views;
 create policy "public can record share views" on public.share_views
   for insert with check (
     exists (
