@@ -8,6 +8,19 @@
       content="Founder Pocket turns everyday observations into business angles, proof checks, and startup dossiers."
     />
     <title>Founder Pocket</title>
+    <script>
+      if (location.hostname.endsWith("github.io")) {
+        var stylesheet = document.createElement("link");
+        stylesheet.rel = "stylesheet";
+        stylesheet.href = "/Founder-Pocket/assets/index.css";
+        document.head.appendChild(stylesheet);
+
+        var script = document.createElement("script");
+        script.type = "module";
+        script.src = "/Founder-Pocket/assets/index.js";
+        document.head.appendChild(script);
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

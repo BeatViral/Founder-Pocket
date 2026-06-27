@@ -59,7 +59,7 @@ npm run preview
 
 This app is frontend-only and can deploy to Vercel, Netlify, or GitHub Pages.
 
-GitHub Pages deployment is configured in `.github/workflows/deploy-pages.yml`. The production Vite build uses `/Founder-Pocket/` as its base path, and the workflow publishes the built `dist` folder with an SPA fallback.
+GitHub Pages is currently compatible with branch-based Pages hosting. The production Vite build uses `/Founder-Pocket/` as its base path, and the built `assets/` files are committed at the repository root so `https://beatviral.github.io/Founder-Pocket/` can serve the app directly.
 
 ## Future Supabase Setup
 
