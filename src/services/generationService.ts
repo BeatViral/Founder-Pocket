@@ -1,4 +1,11 @@
-import { calculateBusinessPotentialScore, calculateStartupReadinessScore, signalForAnswer } from "./scoringService";
+import {
+  analyzeFounderFitEngine,
+  analyzeFounderMarketFit,
+  analyzeFounderPsychology,
+  calculateBusinessPotentialScore,
+  calculateStartupReadinessScore,
+  signalForAnswer
+} from "./scoringService";
 import type {
   BusinessAngle,
   BusinessScan,
@@ -154,7 +161,7 @@ export function generateBusinessAngles(input: ObservationInput): BusinessAngle[]
   const d = domain(input);
 
   if (d === "health") {
-    return [
+    return adaptAnglesForFounder(input, [
       angle(
         "AfterVisit Notes",
         "A tool that turns doctor instructions into clear patient follow-up summaries.",
@@ -197,11 +204,11 @@ export function generateBusinessAngles(input: ObservationInput): BusinessAngle[]
         6,
         "Collect the 20 instructions clinics repeat most often."
       )
-    ];
+    ]);
   }
 
   if (d === "music") {
-    return [
+    return adaptAnglesForFounder(input, [
       angle(
         "FinishFlow",
         "A guided creative workflow that helps musicians turn unfinished demos into finished releases.",
@@ -244,11 +251,11 @@ export function generateBusinessAngles(input: ObservationInput): BusinessAngle[]
         8,
         "Offer 10 manual demo rescue sessions and measure willingness to pay."
       )
-    ];
+    ]);
   }
 
   if (d === "education") {
-    return [
+    return adaptAnglesForFounder(input, [
       angle(
         "ClassPulse",
         "A parent update assistant that helps teachers send simple progress updates without extra admin.",
@@ -277,11 +284,11 @@ export function generateBusinessAngles(input: ObservationInput): BusinessAngle[]
         6,
         "Run a 2-week class communication pilot with one teacher."
       )
-    ];
+    ]);
   }
 
   if (d === "tradie") {
-    return [
+    return adaptAnglesForFounder(input, [
       angle(
         "QuoteMate",
         "A tool that helps tradies turn job notes into professional quotes quickly.",
@@ -310,11 +317,11 @@ export function generateBusinessAngles(input: ObservationInput): BusinessAngle[]
         7,
         "Offer a manual quote-summary service and see if tradies send real jobs."
       )
-    ];
+    ]);
   }
 
   if (d === "restaurant") {
-    return [
+    return adaptAnglesForFounder(input, [
       angle(
         "PrepSense",
         "A simple demand prediction and prep planning tool for small restaurants.",
@@ -343,11 +350,11 @@ export function generateBusinessAngles(input: ObservationInput): BusinessAngle[]
         6,
         "Test whether managers will log waste daily for one week."
       )
-    ];
+    ]);
   }
 
   const observation = input.observationText.replace(/\.$/, "");
-  return [
+  return adaptAnglesForFounder(input, [
     angle(
       "PatternDesk",
       `A focused workspace for people dealing with this repeated pattern: ${observation}.`,
@@ -390,7 +397,7 @@ export function generateBusinessAngles(input: ObservationInput): BusinessAngle[]
       6,
       "Offer the manual version to 5 people and ask what they would pay to keep it."
     )
-  ];
+  ]);
 }
 
 function scanInterpretation(input: ObservationInput) {
@@ -401,6 +408,121 @@ function scanInterpretation(input: ObservationInput) {
   if (d === "tradie") return "This looks like revenue-adjacent admin burden. The business may sit in turning job information into faster quotes or follow-up.";
   if (d === "restaurant") return "This looks like an operations planning problem. The business may sit in reducing waste, stockouts, and repeated kitchen guesswork.";
   return "This looks like a repeated pattern that may hide a business if the affected group, current workaround, and willingness to pay can be proven.";
+}
+
+function founderSpecificAngle(input: ObservationInput): BusinessAngle | undefined {
+  const text = `${input.founderContext ?? ""} ${input.optionalContext} ${input.observationText}`;
+  const observation = input.observationText.replace(/\.$/, "");
+
+  if (!input.founderContext?.trim()) return undefined;
+
+  if (includes(text, /developer|software|technical|code|engineer|api|automation|prototype|build|product/i)) {
+    return angle(
+      "FounderFit Prototype",
+      `A prototype-first product wedge around the repeated workflow behind: ${observation}.`,
+      "The narrow users closest to the repeated workflow",
+      "The team or buyer who needs the workflow solved without a full platform",
+      "A technical or builder founder can test the workflow quickly by showing a working prototype instead of only describing the idea.",
+      "A clickable or lightweight working prototype with one workflow, one status, and one proof capture step.",
+      "SaaS",
+      6,
+      72,
+      6,
+      8,
+      "Build the thinnest prototype and test it with 5 users before adding integrations."
+    );
+  }
+
+  if (includes(text, /creator|artist|musician|writer|producer|audience|content|community|newsletter|youtube|tiktok|podcast/i)) {
+    return angle(
+      "Audience Proof Loop",
+      `A creator-led test for turning the observation into audience demand: ${observation}.`,
+      "People already gathered around the founder's audience, niche, or community",
+      "Community members, sponsors, paid subscribers, course buyers, or service customers",
+      "A creator founder can validate demand through content, replies, waitlists, and direct audience signals before building software.",
+      "A short content series, waitlist, and manual offer that tests the pain and the first solution promise.",
+      "Content/community",
+      4,
+      70,
+      5,
+      8,
+      "Publish the observation, collect replies, and invite 20 people into a manual proof sprint."
+    );
+  }
+
+  if (includes(text, /doctor|nurse|teacher|chef|clinician|therapist|lawyer|accountant|domain|specialist|expert|industry|insider/i)) {
+    return angle(
+      "Insider Workflow Wedge",
+      `An expert-led workflow product based on insider knowledge of: ${observation}.`,
+      "Peers and operators who already trust the founder's domain understanding",
+      "Practices, teams, operators, or budget owners inside the founder's field",
+      "A domain expert can use credibility and exact workflow knowledge to reach better first users than a generic entrant.",
+      "A narrow expert workflow template, tracker, or concierge version that proves the domain-specific wedge.",
+      "B2B tool",
+      5,
+      76,
+      5,
+      9,
+      "Use expert credibility to book 8 workflow interviews and run one concierge pilot."
+    );
+  }
+
+  if (includes(text, /sales|sell|buyer|commercial|pricing|revenue|paid|pilot|client|business owner|consultant|agency|service/i)) {
+    return angle(
+      "Paid Pilot Offer",
+      `A commercial proof path that starts with selling the smallest useful version of: ${observation}.`,
+      "Buyers who feel the pain clearly enough to commit before the product is polished",
+      "Business owners, budget holders, managers, or clients",
+      "A commercial or service founder can validate faster by asking for commitment instead of hiding behind product scope.",
+      "A manual paid pilot offer with clear outcome, timeline, price, and success criteria.",
+      "Service business",
+      3,
+      74,
+      4,
+      8,
+      "Pitch 5 paid pilot conversations and document price objections."
+    );
+  }
+
+  if (includes(text, /admin|operator|operations|manager|coordinator|workflow|process|running|manage/i)) {
+    return angle(
+      "Operator Control Room",
+      `An operator-first dashboard for managing the messy workflow behind: ${observation}.`,
+      "Operators who already coordinate the work manually",
+      "Operations leads, practice managers, owners, and team leads",
+      "An operator founder can see the daily workflow details and design a practical system around real constraints.",
+      "A dashboard with intake, owner, status, due date, notes, and a weekly report.",
+      "Workflow automation",
+      5,
+      78,
+      5,
+      9,
+      "Run the dashboard manually for one team and measure time saved."
+    );
+  }
+
+  return undefined;
+}
+
+function adaptAnglesForFounder(input: ObservationInput, angles: BusinessAngle[]): BusinessAngle[] {
+  if (!input.founderContext?.trim()) return angles;
+
+  const founderAngle = founderSpecificAngle(input);
+  const candidates = founderAngle ? [founderAngle, ...angles] : angles;
+
+  return candidates
+    .map((item) => {
+      const fit = analyzeFounderFitEngine(input, item, []);
+      const fitLift = fit.fitScore >= 55 ? 6 : fit.fitScore >= 40 ? 3 : 0;
+      return {
+        ...item,
+        founderFit: Math.min(10, Math.max(item.founderFit, Math.round(fit.fitScore / 10))),
+        potential: Math.min(95, item.potential + fitLift),
+        recommendedNextStep: `${fit.adaptation.angleStrategy} ${item.recommendedNextStep}`
+      };
+    })
+    .sort((a, b) => b.founderFit + b.potential / 20 - (a.founderFit + a.potential / 20))
+    .slice(0, 5);
 }
 
 function affectedGroups(input: ObservationInput) {
@@ -447,8 +569,11 @@ export function generateBusinessScan(input: ObservationInput): BusinessScan {
   };
 }
 
-export function generateProofCheckQuestions(): ProofCheckQuestion[] {
-  return [
+export function generateProofCheckQuestions(context?: {
+  scan?: BusinessScan;
+  angle?: BusinessAngle;
+}): ProofCheckQuestion[] {
+  const baseQuestions: ProofCheckQuestion[] = [
     {
       id: "who_cares",
       question: "Who exactly would care about this?",
@@ -505,15 +630,102 @@ export function generateProofCheckQuestions(): ProofCheckQuestion[] {
       helperText: "Explain your personal connection to the observation, even if it is early."
     },
     {
+      id: "founder_background",
+      question: "What background, skill, community access, or lived experience gives you an edge?",
+      helperText: "This can be work experience, personal history, domain access, creative taste, technical skill, or a network."
+    },
+    {
+      id: "founder_motivation",
+      question: "Why do you personally want to keep working on this?",
+      helperText: "Name the motivation that would still matter after the easy excitement wears off."
+    },
+    {
+      id: "founder_decision_style",
+      question: "How do you usually make hard decisions?",
+      helperText: "Mention whether you decide through data, conversations, instinct, deadlines, experiments, or outside feedback."
+    },
+    {
+      id: "founder_risk_tolerance",
+      question: "What risk are you willing or unwilling to take here?",
+      helperText: "Be honest about time, money, reputation, health, team, or opportunity-cost limits."
+    },
+    {
+      id: "founder_habits",
+      question: "What founder habit will help or hurt you here?",
+      helperText: "Think about follow-through, focus, shipping speed, avoiding hard conversations, overbuilding, or asking for help."
+    },
+    {
       id: "evidence",
       question: "Do you have any evidence already?",
       helperText: "Mention direct conversations, repeated examples, payment, screenshots, customer requests, or notes."
     }
   ];
+
+  const scan = context?.scan;
+  const angle = context?.angle;
+  if (!scan || !angle) return baseQuestions;
+
+  const engine = analyzeFounderFitEngine(scan.observationInput, angle, []);
+  const adaptiveQuestions: ProofCheckQuestion[] = [];
+
+  if (engine.primaryArchetype === "Technical Founder" || engine.primaryArchetype === "Builder Founder") {
+    adaptiveQuestions.push({
+      id: "technical_unknowns",
+      question: "What is technically unknown or risky about the first version?",
+      helperText: "Name integrations, data, workflow edge cases, security, complexity, or what you would prototype first."
+    });
+  }
+
+  if (engine.primaryArchetype === "Commercial Founder" || engine.primaryArchetype === "Service Founder") {
+    adaptiveQuestions.push({
+      id: "commercial_commitment",
+      question: "What exact commitment could you ask for before building more?",
+      helperText: "Name the paid pilot, LOI, intro, deposit, waitlist action, or next meeting you would ask for."
+    });
+  }
+
+  if (engine.primaryArchetype === "Creator Founder" || engine.primaryArchetype === "Community Founder") {
+    adaptiveQuestions.push({
+      id: "audience_signal",
+      question: "What audience or community signal would prove people care?",
+      helperText: "Think replies, comments, signups, paid interest, shares, referrals, or people asking for the next step."
+    });
+  }
+
+  if (engine.primaryArchetype === "Domain Expert Founder" || engine.primaryArchetype === "Industry Insider Founder") {
+    adaptiveQuestions.push({
+      id: "domain_credibility",
+      question: "What domain credibility lets you see or test this better than an outsider?",
+      helperText: "Mention trust, access, professional context, insider workflow knowledge, or specific people who will talk to you."
+    });
+  }
+
+  if (engine.behaviourMode === "Hesitant Explorer" || engine.behaviourMode === "Early Beginner") {
+    adaptiveQuestions.push({
+      id: "low_pressure_next_step",
+      question: "What is the lowest-pressure validation step you can actually do this week?",
+      helperText: "Pick a step small enough to complete: one message, one note, one call, one post, or one mockup."
+    });
+  }
+
+  if (!adaptiveQuestions.length) {
+    adaptiveQuestions.push({
+      id: "founder_specific_path",
+      question: "What path fits you better than a generic founder?",
+      helperText: "Name whether you should validate through interviews, prototype, audience, client work, expert access, or email."
+    });
+  }
+
+  return [...baseQuestions, ...adaptiveQuestions].filter(
+    (question, index, questions) => questions.findIndex((item) => item.id === question.id) === index
+  );
 }
 
-export function createProofAnswers(raw: Record<string, string>): ProofCheckAnswer[] {
-  return generateProofCheckQuestions().map((question) => ({
+export function createProofAnswers(
+  raw: Record<string, string>,
+  context?: { scan?: BusinessScan; angle?: BusinessAngle }
+): ProofCheckAnswer[] {
+  return generateProofCheckQuestions(context).map((question) => ({
     ...question,
     answer: raw[question.id] ?? "",
     signal: signalForAnswer(raw[question.id] ?? "")
@@ -599,31 +811,37 @@ ${answerById(answers, "current_workaround", scan.currentWorkaround)}
 ## 7. Product Thesis
 ${angle.oneLineDescription} The product should begin with one narrow workflow and avoid acting like a full platform too early.
 
-## 8. First Wedge
+## 8. Founder-Market Fit
+${answerById(answers, "founder_background", "Founder-market fit still needs a sharper explanation of lived experience, customer access, and unfair insight.")}
+
+## 9. Founder Psychology
+${answerById(answers, "founder_motivation", "Founder motivation and operating style still need to be made explicit.")}
+
+## 10. First Wedge
 ${answerById(answers, "smallest_version", angle.firstVersion)}
 
-## 9. Market Opportunity
+## 11. Market Opportunity
 Start with the narrow group that feels the pain most often. If usage and payment are proven, expand into adjacent workflows or nearby customer segments.
 
-## 10. Competitive Landscape
+## 12. Competitive Landscape
 The first competitors are current workarounds, generic tools, internal habits, and status quo behavior.
 
-## 11. Business Model
+## 13. Business Model
 ${angle.whoMightPay} could pay through a subscription, paid pilot, service package, or per-workflow fee if the product saves time, reduces risk, or improves outcomes.
 
-## 12. MVP Scope
+## 14. MVP Scope
 ${angle.firstVersion}
 
-## 13. Go-To-Market Plan
+## 15. Go-To-Market Plan
 Start founder-led. Contact the first 5 to 10 people most likely to react, show the smallest version, and ask what would make it worth paying for.
 
-## 14. Validation Plan
+## 16. Validation Plan
 Talk to target users, test a landing page, show a mockup, offer a concierge version, and ask for a paid pilot or concrete commitment.
 
-## 15. Risks and Assumptions
+## 17. Risks and Assumptions
 ${answerById(answers, "could_be_wrong", "The idea could be wrong if the pain is not frequent, not urgent, or not tied to a buyer.")}
 
-## 16. Next 30 Days
+## 18. Next 30 Days
 ${angle.recommendedNextStep}`;
 }
 
@@ -644,8 +862,14 @@ function acceleratorAnswers(scan: BusinessScan, angle: BusinessAngle, answers: P
     ["How will it make money?", `${angle.whoMightPay} could pay if the product proves a clear time, cost, or outcome improvement.`],
     [
       "Why are you a good person to explore this?",
-      answerById(answers, "seen_personally", "You noticed the pattern early. Founder fit improves if you have direct access to the people affected.")
+      answerById(
+        answers,
+        "founder_background",
+        answerById(answers, "seen_personally", "You noticed the pattern early. Founder-market fit improves if you have direct access to the people affected.")
+      )
     ],
+    ["What founder-market fit do you have?", answerById(answers, "founder_background", "Founder-market fit still needs proof.")],
+    ["What is your risk posture?", answerById(answers, "founder_risk_tolerance", "Risk boundaries still need to be named.")],
     ["What is the first version?", answerById(answers, "smallest_version", angle.firstVersion)],
     ["What is the next milestone?", angle.recommendedNextStep]
   ];
@@ -705,12 +929,34 @@ Quiet, focused, credible, and practical. The first user should understand what t
 ${list(["A target user can complete the first workflow in under 5 minutes.", "The product makes missing information visible.", "The founder can measure whether the workflow creates value.", "The MVP can be used in a real pilot."])}`;
 }
 
-function validationSprint(angle: BusinessAngle) {
-  return `## 14-day plan
-${list(["Talk to 10 target users", "Write down current workarounds and exact phrases", "Create a one-page landing page", "Show a simple mockup", "Test pricing with the buyer", "Offer a manual or concierge version"])}
+function pathPlan(path: ReturnType<typeof analyzeFounderFitEngine>["validationPath"]) {
+  const plans: Record<ReturnType<typeof analyzeFounderFitEngine>["validationPath"], string[]> = {
+    "interview-first": ["Send 10 direct interview requests", "Run 5 discovery calls", "Extract exact words and current workarounds"],
+    "prototype-first": ["Build a clickable or lightweight prototype", "Watch 5 users try it", "Log technical unknowns and must-have workflow steps"],
+    "audience-first": ["Publish the observation", "Collect replies and signups", "Invite the warmest responders into a manual proof sprint"],
+    "client-first": ["Package a narrow paid pilot", "Pitch 5 likely buyers", "Record price objections and commitment signals"],
+    "expert-first": ["Interview 5 domain peers", "Map insider workflow constraints", "Ask one trusted expert to review the first wedge"],
+    "email-first": ["Send 5 low-pressure messages", "Ask one concrete question", "Use replies to choose the next proof step"]
+  };
+
+  return plans[path];
+}
+
+function validationSprint(angle: BusinessAngle, engine: ReturnType<typeof analyzeFounderFitEngine>) {
+  return `## Recommended path
+${engine.validationPath}
+
+## Why this path fits
+${engine.adaptation.angleStrategy}
+
+## Founder-specific proof moves
+${list(pathPlan(engine.validationPath))}
+
+## 14-day plan
+${list(["Talk to 10 target users", "Write down current workarounds and exact phrases", "Create a one-page landing page", "Show a simple mockup", "Test pricing with the buyer", "Offer a manual or concierge version", "Write the founder-market fit narrative and test whether customers believe it"])}
 
 ## 30-day plan
-${list(["Build a clickable prototype", "Get 3 expressions of interest", "Get 1 paid pilot if possible", "Improve the dossier with evidence", "Update the readiness score", `Decide whether to continue, narrow, or change ${angle.name}`])}`;
+${list(["Build a clickable prototype", "Get 3 expressions of interest", "Get 1 paid pilot if possible", "Improve the dossier with evidence", "Update the readiness score", "Update validation task statuses", `Decide whether to continue, narrow, or change ${angle.name}`])}`;
 }
 
 function videoScript(scan: BusinessScan, angle: BusinessAngle, answers: ProofCheckAnswer[]) {
@@ -747,16 +993,17 @@ Status: ${score.label}
 
 ## Category scores
 ${list([
-  `Observation clarity: ${score.categories.observationClarity}/10`,
-  `Customer specificity: ${score.categories.customerSpecificity}/12`,
-  `Buyer clarity: ${score.categories.buyerClarity}/12`,
-  `Current workaround clarity: ${score.categories.currentWorkaroundClarity}/10`,
-  `MVP clarity: ${score.categories.mvpClarity}/10`,
+  `Observation clarity: ${score.categories.observationClarity}/8`,
+  `Customer specificity: ${score.categories.customerSpecificity}/10`,
+  `Buyer clarity: ${score.categories.buyerClarity}/10`,
+  `Current workaround clarity: ${score.categories.currentWorkaroundClarity}/8`,
+  `MVP clarity: ${score.categories.mvpClarity}/8`,
   `Validation evidence: ${score.categories.validationEvidence}/12`,
-  `Founder fit: ${score.categories.founderFit}/9`,
+  `Founder-market fit: ${score.categories.founderMarketFit}/10`,
+  `Founder psychology: ${score.categories.founderPsychology}/8`,
   `Risk awareness: ${score.categories.riskAwareness}/8`,
   `Go-to-market clarity: ${score.categories.goToMarketClarity}/8`,
-  `Next-step clarity: ${score.categories.nextStepClarity}/9`
+  `Next-step clarity: ${score.categories.nextStepClarity}/10`
 ])}
 
 ## Strong signals
@@ -772,8 +1019,129 @@ ${score.missingProof.length ? list(score.missingProof) : "- Pricing and repeat u
 ${list(score.nextActions)}`;
 }
 
+function founderPsychologySection(profile: ReturnType<typeof analyzeFounderPsychology>) {
+  return `# Founder Psychology Engine
+
+Score: ${profile.total}/100
+Status: ${profile.label}
+
+## Dimensions
+${list([
+  `Motivation: ${profile.dimensions.motivation}/20`,
+  `Risk tolerance: ${profile.dimensions.riskTolerance}/20`,
+  `Decision clarity: ${profile.dimensions.decisionClarity}/20`,
+  `Execution habits: ${profile.dimensions.executionHabits}/20`,
+  `Learning loop: ${profile.dimensions.learningLoop}/20`
+])}
+
+## Primary motivation
+${profile.primaryMotivation}
+
+## Decision style
+${profile.decisionStyle}
+
+## Risk posture
+${profile.riskPosture}
+
+## Strengths
+${profile.strengths.length ? list(profile.strengths) : "- No strong psychology signal yet."}
+
+## Watchouts
+${profile.watchouts.length ? list(profile.watchouts) : "- No major watchouts yet."}
+
+## Operating rules
+${list(profile.operatingRules)}`;
+}
+
+function founderMarketFitSection(profile: ReturnType<typeof analyzeFounderMarketFit>) {
+  return `# Founder-Market Fit Extraction
+
+Score: ${profile.total}/100
+Status: ${profile.label}
+
+## Narrative
+${profile.narrative}
+
+## Dimensions
+${list([
+  `Lived experience: ${profile.dimensions.livedExperience}/20`,
+  `Customer access: ${profile.dimensions.customerAccess}/20`,
+  `Unfair insight: ${profile.dimensions.unfairInsight}/20`,
+  `Credibility: ${profile.dimensions.credibility}/20`,
+  `Persistence: ${profile.dimensions.persistence}/20`
+])}
+
+## Strengths
+${profile.strengths.length ? list(profile.strengths) : "- Founder-market fit is still forming."}
+
+## Gaps
+${profile.gaps.length ? list(profile.gaps) : "- No major founder-market fit gaps detected."}
+
+## Proof to collect
+${profile.proofToCollect.length ? list(profile.proofToCollect) : "- Keep collecting direct customer proof and update this section."}`;
+}
+
+function founderFitEngineSection(profile: ReturnType<typeof analyzeFounderFitEngine>) {
+  return `# Founder Fit Engine
+
+Score: ${profile.fitScore}/100
+Status: ${profile.label}
+
+## Founder profile layer
+Primary archetype: ${profile.primaryArchetype}
+
+All detected archetypes:
+${list(profile.archetypes)}
+
+## Founder insight layer
+${list(profile.insightTypes)}
+
+## Founder behaviour layer
+Mode: ${profile.behaviourMode}
+
+Communication style: ${profile.communicationStyle}
+
+Validation path: ${profile.validationPath}
+
+## Founder fit layer
+${list([
+  `Domain fit: ${profile.dimensions.domainFit}/10`,
+  `Credibility fit: ${profile.dimensions.credibilityFit}/10`,
+  `Insight fit: ${profile.dimensions.insightFit}/10`,
+  `Customer access: ${profile.dimensions.customerAccess}/10`,
+  `Validation ability: ${profile.dimensions.validationAbility}/10`,
+  `Build or brief ability: ${profile.dimensions.buildOrBriefAbility}/10`,
+  `Reach ability: ${profile.dimensions.reachAbility}/10`,
+  `Emotional commitment: ${profile.dimensions.emotionalCommitment}/10`,
+  `Network advantage: ${profile.dimensions.networkAdvantage}/10`,
+  `Execution readiness: ${profile.dimensions.executionReadiness}/10`
+])}
+
+## Strong signals
+${profile.strongSignals.length ? list(profile.strongSignals) : "- Strong founder fit signals still need proof."}
+
+## Weak signals
+${profile.weakSignals.length ? list(profile.weakSignals) : "- No major founder fit weak signals detected."}
+
+## Adaptation layer
+Angle strategy: ${profile.adaptation.angleStrategy}
+
+Proof check mode: ${profile.adaptation.proofQuestionMode}
+
+Dossier tone: ${profile.adaptation.dossierTone}
+
+Share emphasis:
+${list([
+  `Investor mode: ${profile.adaptation.shareEmphasis.investor.join(", ")}`,
+  `Builder mode: ${profile.adaptation.shareEmphasis.builder.join(", ")}`,
+  `Accelerator mode: ${profile.adaptation.shareEmphasis.accelerator.join(", ")}`
+])}`;
+}
+
 const dataRoomChecklist = [
   "Founder bio",
+  "Founder psychology profile",
+  "Founder-market fit narrative",
   "One-page snapshot",
   "Full dossier",
   "Mockup",
@@ -815,28 +1183,119 @@ function missingProofItems(score: ReturnType<typeof calculateStartupReadinessSco
   }));
 }
 
-function validationTasks(angle: BusinessAngle): ValidationTask[] {
+function validationPathTask(engine: ReturnType<typeof analyzeFounderFitEngine>): ValidationTask {
+  const pathTasks: Record<ReturnType<typeof analyzeFounderFitEngine>["validationPath"], ValidationTask> = {
+    "interview-first": {
+      id: uid("task"),
+      title: "Run founder-fit interviews",
+      description: "Interview people in the first customer segment and test whether your founder story earns trust.",
+      phase: "14-day",
+      status: "todo",
+      evidenceHint: "Capture exact quotes about the problem and whether your background makes the test credible."
+    },
+    "prototype-first": {
+      id: uid("task"),
+      title: "Prototype the wedge",
+      description: "Build the smallest clickable or working version that proves the core workflow.",
+      phase: "14-day",
+      status: "todo",
+      evidenceHint: "Watch users try it and record where they hesitate, ask for more, or misunderstand."
+    },
+    "audience-first": {
+      id: uid("task"),
+      title: "Test with audience or community",
+      description: "Share the observation with a warm audience and invite people into a manual proof sprint.",
+      phase: "14-day",
+      status: "todo",
+      evidenceHint: "Track replies, signups, DMs, shares, and people asking for the next step."
+    },
+    "client-first": {
+      id: uid("task"),
+      title: "Pitch a paid pilot",
+      description: "Package the smallest useful outcome and ask likely buyers for a real commitment.",
+      phase: "14-day",
+      status: "todo",
+      evidenceHint: "Track price, objections, decision-maker, timeline, and whether they commit."
+    },
+    "expert-first": {
+      id: uid("task"),
+      title: "Pressure-test with domain experts",
+      description: "Ask trusted domain insiders whether the workflow, buyer, and risk assumptions are real.",
+      phase: "14-day",
+      status: "todo",
+      evidenceHint: "Capture corrections, insider constraints, and who they would introduce you to."
+    },
+    "email-first": {
+      id: uid("task"),
+      title: "Send low-pressure validation messages",
+      description: "Send a short message to people close to the problem and ask one concrete question.",
+      phase: "14-day",
+      status: "todo",
+      evidenceHint: "Save replies and use them to choose the next call, mockup, or pilot."
+    }
+  };
+
+  return pathTasks[engine.validationPath];
+}
+
+function validationTasks(angle: BusinessAngle, engine: ReturnType<typeof analyzeFounderFitEngine>): ValidationTask[] {
   return [
+    validationPathTask(engine),
     {
       id: uid("task"),
       title: "Talk to target users",
       description: `Interview people who match: ${angle.whoItHelps}`,
       phase: "14-day",
-      status: "todo"
+      status: "todo",
+      evidenceHint: "Add names, roles, and exact quotes from at least 10 conversations."
+    },
+    {
+      id: uid("task"),
+      title: "Map current workarounds",
+      description: "Write down what people do today, what breaks, and what they wish was easier.",
+      phase: "14-day",
+      status: "todo",
+      evidenceHint: "Collect screenshots, notes, tools used, and repeated phrases."
     },
     {
       id: uid("task"),
       title: "Show a mockup",
       description: `Mock up the first version: ${angle.firstVersion}`,
       phase: "14-day",
-      status: "todo"
+      status: "todo",
+      evidenceHint: "Record objections, moments of interest, and what they expected to happen next."
+    },
+    {
+      id: uid("task"),
+      title: "Test founder-market fit story",
+      description: "Explain why you are the right person to explore this and see whether the audience trusts it.",
+      phase: "14-day",
+      status: "todo",
+      evidenceHint: "Note which parts made people trust you and which felt generic."
     },
     {
       id: uid("task"),
       title: "Ask for commitment",
       description: "Ask for a paid pilot, LOI, waitlist signup, or next meeting.",
       phase: "30-day",
-      status: "todo"
+      status: "todo",
+      evidenceHint: "Track yes/no answers, price reaction, and what commitment they actually made."
+    },
+    {
+      id: uid("task"),
+      title: "Update dossier with evidence",
+      description: "Edit the dossier sections after each validation sprint so the score reflects reality.",
+      phase: "30-day",
+      status: "todo",
+      evidenceHint: "Paste direct quotes, proof, objections, and changed assumptions into the dossier."
+    },
+    {
+      id: uid("task"),
+      title: "Decide continue, narrow, or stop",
+      description: `Use the evidence to decide whether to continue, narrow, or change ${angle.name}.`,
+      phase: "30-day",
+      status: "todo",
+      evidenceHint: "Make the decision from proof, not momentum."
     }
   ];
 }
@@ -847,21 +1306,27 @@ export function generateStartupDossier(
   proofAnswers: ProofCheckAnswer[]
 ): StartupDossier {
   const readinessScore = calculateStartupReadinessScore(scan.observationInput, selectedAngle, proofAnswers);
+  const founderFitEngine = analyzeFounderFitEngine(scan.observationInput, selectedAngle, proofAnswers);
+  const founderPsychology = analyzeFounderPsychology(proofAnswers);
+  const founderMarketFit = analyzeFounderMarketFit(scan.observationInput, selectedAngle, proofAnswers);
   const startupName = generateStartupName(scan, selectedAngle);
   const now = new Date().toISOString();
   const sections: DossierSection[] = [
     section("snapshot", "One-page Business Snapshot", snapshot(scan, selectedAngle, proofAnswers), 1),
     section("full_dossier", "Full Startup Dossier", fullDossier(scan, selectedAngle, proofAnswers), 2),
-    section("accelerator_answers", "Accelerator-style Answers", acceleratorAnswers(scan, selectedAngle, proofAnswers), 3),
-    section("faq", "Investor/Advisor FAQ", faq(scan, selectedAngle, proofAnswers), 4),
-    section("proof_check", "Proof Check", proofCheckSection(proofAnswers), 5),
-    section("readiness_score", "Startup Readiness Score", readinessSection(readinessScore), 6),
-    section("mvp_build_brief", "MVP Build Brief", buildBrief(selectedAngle), 7),
-    section("validation_sprint", "Validation Sprint", validationSprint(selectedAngle), 8),
-    section("founder_video_script", "Founder Video Script", videoScript(scan, selectedAngle, proofAnswers), 9),
-    section("outreach_email", "Outreach Email", outreachEmail(scan, selectedAngle), 10),
-    section("data_room_checklist", "Data Room Checklist", list(dataRoomChecklist), 11),
-    section("missing_proof", "Missing Proof", list(readinessScore.missingProof.length ? readinessScore.missingProof : ["Pricing evidence", "Repeat usage", "A named first buyer"]), 12)
+    section("founder_fit_engine", "Founder Fit Engine", founderFitEngineSection(founderFitEngine), 3),
+    section("founder_market_fit", "Founder-Market Fit", founderMarketFitSection(founderMarketFit), 4),
+    section("founder_psychology", "Founder Psychology", founderPsychologySection(founderPsychology), 5),
+    section("accelerator_answers", "Accelerator-style Answers", acceleratorAnswers(scan, selectedAngle, proofAnswers), 6),
+    section("faq", "Investor/Advisor FAQ", faq(scan, selectedAngle, proofAnswers), 7),
+    section("proof_check", "Proof Check", proofCheckSection(proofAnswers), 8),
+    section("readiness_score", "Startup Readiness Score", readinessSection(readinessScore), 9),
+    section("mvp_build_brief", "MVP Build Brief", buildBrief(selectedAngle), 10),
+    section("validation_sprint", "Validation Sprint", validationSprint(selectedAngle, founderFitEngine), 11),
+    section("founder_video_script", "Founder Video Script", videoScript(scan, selectedAngle, proofAnswers), 12),
+    section("outreach_email", "Outreach Email", outreachEmail(scan, selectedAngle), 13),
+    section("data_room_checklist", "Data Room Checklist", list(dataRoomChecklist), 14),
+    section("missing_proof", "Missing Proof", list(readinessScore.missingProof.length ? readinessScore.missingProof : ["Pricing evidence", "Repeat usage", "A named first buyer"]), 15)
   ];
 
   return {
@@ -874,10 +1339,13 @@ export function generateStartupDossier(
     oneLiner: generateOneLiner(selectedAngle),
     status: readinessScore.total >= 75 ? "Strong opportunity signal" : readinessScore.total >= 60 ? "Business angle found" : "Interesting but needs more proof",
     readinessScore,
+    founderFitEngine,
+    founderPsychology,
+    founderMarketFit,
     sections,
     proofAnswers,
     missingProofItems: missingProofItems(readinessScore),
-    validationTasks: validationTasks(selectedAngle),
+    validationTasks: validationTasks(selectedAngle, founderFitEngine),
     shareLinks: [],
     createdAt: now,
     updatedAt: now

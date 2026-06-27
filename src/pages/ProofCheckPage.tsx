@@ -24,7 +24,6 @@ export default function ProofCheckPage() {
   const [scan, setScan] = useState<BusinessScan | undefined>();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [gateOpen, setGateOpen] = useState(false);
-  const questions = useMemo(() => generateProofCheckQuestions(), []);
 
   useEffect(() => {
     if (id) storageService.getScan(id).then(setScan);
@@ -35,7 +34,14 @@ export default function ProofCheckPage() {
     return scan.angles.find((angle) => angle.id === params.get("angle")) ?? scan.angles[0];
   }, [scan, params]);
 
-  const proofAnswers = useMemo(() => createProofAnswers(answers), [answers]);
+  const questions = useMemo(
+    () => generateProofCheckQuestions({ scan, angle: selectedAngle }),
+    [scan, selectedAngle]
+  );
+  const proofAnswers = useMemo(
+    () => createProofAnswers(answers, { scan, angle: selectedAngle }),
+    [answers, scan, selectedAngle]
+  );
   const previewScore =
     scan && selectedAngle
       ? calculateStartupReadinessScore(scan.observationInput, selectedAngle, proofAnswers)
@@ -122,8 +128,10 @@ export default function ProofCheckPage() {
                 </div>
                 <div className="mt-5 grid gap-3 text-sm text-slate-300">
                   <Summary label="Proof Strength" value={`${previewScore.categories.validationEvidence}/12`} />
-                  <Summary label="Buyer Clarity" value={`${previewScore.categories.buyerClarity}/12`} />
-                  <Summary label="MVP Clarity" value={`${previewScore.categories.mvpClarity}/10`} />
+                  <Summary label="Buyer Clarity" value={`${previewScore.categories.buyerClarity}/10`} />
+                  <Summary label="MVP Clarity" value={`${previewScore.categories.mvpClarity}/8`} />
+                  <Summary label="Founder-Market Fit" value={`${previewScore.categories.founderMarketFit}/10`} />
+                  <Summary label="Founder Psychology" value={`${previewScore.categories.founderPsychology}/8`} />
                   <Summary label="Risk Awareness" value={`${previewScore.categories.riskAwareness}/8`} />
                   <Summary label="Sendability" value={previewScore.label} />
                   <Summary label="Missing Proof" value={previewScore.missingProof[0] ?? "Pricing and repeat usage"} />

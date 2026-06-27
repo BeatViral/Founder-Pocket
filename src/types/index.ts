@@ -76,6 +76,9 @@ export type ScoreBand =
 export type DossierSectionType =
   | "snapshot"
   | "full_dossier"
+  | "founder_fit_engine"
+  | "founder_psychology"
+  | "founder_market_fit"
   | "accelerator_answers"
   | "faq"
   | "proof_check"
@@ -98,6 +101,7 @@ export type ObservationInput = {
   id: string;
   observationText: string;
   optionalContext: string;
+  founderContext?: string;
   whereNoticed: WhereNoticed;
   ideaState: IdeaState;
   desiredOutcome: DesiredOutcome;
@@ -181,7 +185,8 @@ export type StartupReadinessScore = {
     currentWorkaroundClarity: number;
     mvpClarity: number;
     validationEvidence: number;
-    founderFit: number;
+    founderMarketFit: number;
+    founderPsychology: number;
     riskAwareness: number;
     goToMarketClarity: number;
     nextStepClarity: number;
@@ -190,6 +195,125 @@ export type StartupReadinessScore = {
   weakSignals: string[];
   missingProof: string[];
   nextActions: string[];
+};
+
+export type FounderPsychologyProfile = {
+  total: number;
+  label: string;
+  dimensions: {
+    motivation: number;
+    riskTolerance: number;
+    decisionClarity: number;
+    executionHabits: number;
+    learningLoop: number;
+  };
+  primaryMotivation: string;
+  decisionStyle: string;
+  riskPosture: string;
+  strengths: string[];
+  watchouts: string[];
+  operatingRules: string[];
+};
+
+export type FounderMarketFitProfile = {
+  total: number;
+  label: string;
+  dimensions: {
+    livedExperience: number;
+    customerAccess: number;
+    unfairInsight: number;
+    credibility: number;
+    persistence: number;
+  };
+  narrative: string;
+  strengths: string[];
+  gaps: string[];
+  proofToCollect: string[];
+};
+
+export type FounderArchetype =
+  | "Domain Expert Founder"
+  | "Operator Founder"
+  | "Creator Founder"
+  | "Technical Founder"
+  | "Service Founder"
+  | "Industry Insider Founder"
+  | "Problem Witness Founder"
+  | "Community Founder"
+  | "Commercial Founder"
+  | "Builder Founder";
+
+export type FounderInsightType =
+  | "workflow insight"
+  | "customer insight"
+  | "pain insight"
+  | "operational insight"
+  | "behavioural insight"
+  | "market insight"
+  | "emotional insight"
+  | "access insight";
+
+export type FounderBehaviourMode =
+  | "Hesitant Explorer"
+  | "Practical Operator"
+  | "Vision-Led Founder"
+  | "Builder Founder"
+  | "Analytical Founder"
+  | "Creator Founder"
+  | "Commercial Founder"
+  | "Early Beginner";
+
+export type DossierTone =
+  | "plain"
+  | "technical"
+  | "structured"
+  | "narrative"
+  | "commercial"
+  | "practical"
+  | "founder-authentic";
+
+export type ValidationPath =
+  | "interview-first"
+  | "prototype-first"
+  | "audience-first"
+  | "client-first"
+  | "expert-first"
+  | "email-first";
+
+export type FounderFitEngineProfile = {
+  archetypes: FounderArchetype[];
+  primaryArchetype: FounderArchetype;
+  insightTypes: FounderInsightType[];
+  behaviourMode: FounderBehaviourMode;
+  communicationStyle: DossierTone;
+  validationPath: ValidationPath;
+  fitScore: number;
+  label: string;
+  dimensions: {
+    domainFit: number;
+    credibilityFit: number;
+    insightFit: number;
+    customerAccess: number;
+    validationAbility: number;
+    buildOrBriefAbility: number;
+    reachAbility: number;
+    emotionalCommitment: number;
+    networkAdvantage: number;
+    executionReadiness: number;
+  };
+  strongSignals: string[];
+  weakSignals: string[];
+  adaptation: {
+    angleStrategy: string;
+    proofQuestionMode: string;
+    dossierTone: DossierTone;
+    validationPath: ValidationPath;
+    shareEmphasis: {
+      investor: string[];
+      builder: string[];
+      accelerator: string[];
+    };
+  };
 };
 
 export type MissingProofItem = {
@@ -206,6 +330,7 @@ export type ValidationTask = {
   description: string;
   phase: "14-day" | "30-day";
   status: "todo" | "doing" | "done";
+  evidenceHint?: string;
 };
 
 export type DossierSection = {
@@ -236,6 +361,9 @@ export type StartupDossier = {
   oneLiner: string;
   status: BusinessScanStatus;
   readinessScore: StartupReadinessScore;
+  founderFitEngine?: FounderFitEngineProfile;
+  founderPsychology?: FounderPsychologyProfile;
+  founderMarketFit?: FounderMarketFitProfile;
   sections: DossierSection[];
   proofAnswers: ProofCheckAnswer[];
   missingProofItems: MissingProofItem[];

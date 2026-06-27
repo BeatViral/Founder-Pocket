@@ -24,6 +24,7 @@ export default function ScanPage() {
   const state = location.state as LocationState | null;
   const [observationText, setObservationText] = useState(state?.observationText ?? "");
   const [optionalContext, setOptionalContext] = useState("");
+  const [founderContext, setFounderContext] = useState("");
   const [whereNoticed, setWhereNoticed] = useState<WhereNoticed>("Work");
   const [ideaState, setIdeaState] = useState<IdeaState>("No, just checking");
   const [desiredOutcome, setDesiredOutcome] = useState<DesiredOutcome>("Just scan for possibilities");
@@ -42,6 +43,7 @@ export default function ScanPage() {
     const input = createObservationInput({
       observationText,
       optionalContext,
+      founderContext,
       whereNoticed,
       ideaState,
       desiredOutcome
@@ -99,6 +101,16 @@ export default function ScanPage() {
             </FieldLabel>
             <FieldLabel label="Optional context" helper="Add where you saw it, who was involved, or why it stood out.">
               <Textarea value={optionalContext} onChange={(event) => setOptionalContext(event.target.value)} />
+            </FieldLabel>
+            <FieldLabel
+              label="Your connection to this"
+              helper="Optional: role, background, skills, access, or why you are the person who noticed it."
+            >
+              <Textarea
+                value={founderContext}
+                onChange={(event) => setFounderContext(event.target.value)}
+                placeholder="I'm a clinic admin / builder / creator / operator / patient / teacher..."
+              />
             </FieldLabel>
             <div className="grid gap-4 md:grid-cols-3">
               <FieldLabel label="Where did you notice it?">

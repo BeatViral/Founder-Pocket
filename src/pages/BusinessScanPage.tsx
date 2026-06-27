@@ -92,7 +92,10 @@ export default function BusinessScanPage() {
           <div className="grid gap-4 md:grid-cols-3">
             <InfoCard title="Who may be affected" items={scan.affectedGroups} />
             <InfoCard title="Why it may matter" items={[scan.whyItMayMatter]} />
-            <InfoCard title="Current workaround" items={[scan.currentWorkaround]} />
+            <InfoCard
+              title={scan.observationInput.founderContext ? "Founder lens" : "Current workaround"}
+              items={[scan.observationInput.founderContext || scan.currentWorkaround]}
+            />
           </div>
 
           <section>

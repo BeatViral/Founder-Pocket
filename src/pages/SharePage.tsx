@@ -13,6 +13,9 @@ const modeSections: Record<ShareMode, DossierSectionType[]> = {
   full: [
     "snapshot",
     "full_dossier",
+    "founder_fit_engine",
+    "founder_market_fit",
+    "founder_psychology",
     "accelerator_answers",
     "faq",
     "proof_check",
@@ -24,9 +27,9 @@ const modeSections: Record<ShareMode, DossierSectionType[]> = {
     "data_room_checklist",
     "missing_proof"
   ],
-  investor: ["snapshot", "full_dossier", "faq", "readiness_score", "missing_proof"],
-  builder: ["mvp_build_brief", "validation_sprint", "missing_proof"],
-  accelerator: ["accelerator_answers", "founder_video_script", "proof_check", "readiness_score"]
+  investor: ["snapshot", "founder_fit_engine", "founder_market_fit", "full_dossier", "faq", "readiness_score", "missing_proof"],
+  builder: ["founder_fit_engine", "founder_market_fit", "mvp_build_brief", "validation_sprint", "missing_proof"],
+  accelerator: ["accelerator_answers", "founder_fit_engine", "founder_market_fit", "founder_psychology", "founder_video_script", "proof_check", "readiness_score"]
 };
 
 export default function SharePage({ mode }: { mode?: ShareMode }) {

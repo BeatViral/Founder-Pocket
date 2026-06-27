@@ -1,5 +1,5 @@
 import { storageService } from "./storageService";
-import type { DossierSection, StartupDossier } from "../types";
+import type { DossierSection, StartupDossier, ValidationTask } from "../types";
 
 export const dossierService = {
   listDossiers() {
@@ -29,6 +29,21 @@ export const dossierService = {
     const updated = {
       ...dossier,
       sections: dossier.sections.map((item) => (item.id === section.id ? updatedSection : item)),
+      updatedAt: new Date().toISOString()
+    };
+
+    return storageService.saveDossier(updated);
+  },
+
+  async updateValidationTask(dossierId: string, taskId: string, status: ValidationTask["status"]) {
+    const dossier = await storageService.getDossier(dossierId);
+    if (!dossier) return undefined;
+
+    const updated = {
+      ...dossier,
+      validationTasks: (dossier.validationTasks ?? []).map((task) =>
+        task.id === taskId ? { ...task, status } : task
+      ),
       updatedAt: new Date().toISOString()
     };
 

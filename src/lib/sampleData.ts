@@ -20,6 +20,7 @@ function makeSample(
   const input = createObservationInput({
     observationText,
     optionalContext,
+    founderContext: "I have direct access to people in this niche, understand the current workflow, and can run early validation through warm conversations.",
     whereNoticed,
     ideaState: "Maybe",
     desiredOutcome: "Find a business angle"
@@ -38,6 +39,11 @@ function makeSample(
     what_proves_real: "Ten interviews, three expressions of interest, and one paid or time-committed pilot would prove the signal.",
     could_be_wrong: "The idea could be wrong if the pain is real but not urgent enough to pay for.",
     seen_personally: "This came from a repeated personal observation, not a random idea prompt.",
+    founder_background: "The founder has direct access to people in the niche, understands the workaround, and can reach early testers without paid acquisition.",
+    founder_motivation: "The founder wants to make the repeated workflow clearer and less stressful, and has enough curiosity to keep interviewing even when the first version changes.",
+    founder_decision_style: "The founder will decide through weekly evidence reviews, direct customer conversations, and clear continue, narrow, or stop thresholds.",
+    founder_risk_tolerance: "The founder is willing to risk focused build time and small manual pilots, but not a large product build before proof exists.",
+    founder_habits: "The useful habit is shipping small tests quickly; the watchout is overbuilding before enough customers have reacted.",
     evidence: "The evidence so far is repeated observation and visible workarounds, with direct customer proof still needed."
   });
 

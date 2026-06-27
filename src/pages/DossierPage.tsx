@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { EditableSection } from "../components/dossier/EditableSection";
 import { ShareModal } from "../components/dossier/ShareModal";
+import { ValidationTracker } from "../components/dossier/ValidationTracker";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -16,6 +17,9 @@ import type { DossierSectionType, StartupDossier } from "../types";
 const sectionLabels: Record<DossierSectionType, string> = {
   snapshot: "Snapshot",
   full_dossier: "Full Dossier",
+  founder_fit_engine: "Founder Fit Engine",
+  founder_psychology: "Founder Psychology",
+  founder_market_fit: "Founder-Market Fit",
   accelerator_answers: "Accelerator Answers",
   faq: "FAQ",
   proof_check: "Proof Check",
@@ -44,6 +48,10 @@ export default function DossierPage() {
   const activeSection = useMemo(
     () => dossier?.sections.find((section) => section.type === activeType) ?? dossier?.sections[0],
     [dossier, activeType]
+  );
+  const sortedSections = useMemo(
+    () => [...(dossier?.sections ?? [])].sort((a, b) => a.order - b.order),
+    [dossier?.sections]
   );
 
   if (!dossier || !activeSection) {
@@ -122,21 +130,19 @@ export default function DossierPage() {
 
       <div className="grid gap-5 lg:grid-cols-[230px_1fr_320px]">
         <aside className="no-print space-y-2 lg:sticky lg:top-24 lg:self-start">
-          {dossier.sections
-            .sort((a, b) => a.order - b.order)
-            .map((section) => (
-              <button
-                key={section.id}
-                onClick={() => setActiveType(section.type)}
-                className={`w-full rounded-md border px-3 py-2 text-left text-sm font-semibold transition ${
-                  activeSection.type === section.type
-                    ? "border-signal bg-signal/15 text-white"
-                    : "border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.08]"
-                }`}
-              >
-                {sectionLabels[section.type]}
-              </button>
-            ))}
+          {sortedSections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => setActiveType(section.type)}
+              className={`w-full rounded-md border px-3 py-2 text-left text-sm font-semibold transition ${
+                activeSection.type === section.type
+                  ? "border-signal bg-signal/15 text-white"
+                  : "border-white/10 bg-white/[0.05] text-slate-300 hover:bg-white/[0.08]"
+              }`}
+            >
+              {sectionLabels[section.type]}
+            </button>
+          ))}
         </aside>
 
         <EditableSection section={activeSection} onSave={saveSection} />
@@ -148,6 +154,26 @@ export default function DossierPage() {
               <ScoreBar value={dossier.readinessScore.total} label={dossier.readinessScore.label} />
             </div>
           </Card>
+          {dossier.founderFitEngine || dossier.founderMarketFit || dossier.founderPsychology ? (
+            <Card className="p-5">
+              <h2 className="font-bold">Founder engine</h2>
+              {dossier.founderFitEngine ? (
+                <div className="mt-4">
+                  <ScoreBar value={dossier.founderFitEngine.fitScore} label={dossier.founderFitEngine.label} />
+                </div>
+              ) : null}
+              {dossier.founderMarketFit ? (
+                <div className="mt-4">
+                  <ScoreBar value={dossier.founderMarketFit.total} label={dossier.founderMarketFit.label} />
+                </div>
+              ) : null}
+              {dossier.founderPsychology ? (
+                <div className="mt-4">
+                  <ScoreBar value={dossier.founderPsychology.total} label={dossier.founderPsychology.label} />
+                </div>
+              ) : null}
+            </Card>
+          ) : null}
           <Card className="p-5">
             <h2 className="font-bold">Missing proof</h2>
             <div className="mt-3 space-y-2">
@@ -159,6 +185,7 @@ export default function DossierPage() {
               ))}
             </div>
           </Card>
+          <ValidationTracker dossier={dossier} onUpdated={setDossier} />
           <Card className="p-5">
             <h2 className="font-bold">Next actions</h2>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
