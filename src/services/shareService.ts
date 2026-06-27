@@ -20,7 +20,7 @@ function withUpdatedShareLink(dossier: StartupDossier, link: ShareLink): Startup
 }
 
 export const shareService = {
-  async createShareLink(dossierId: string, mode: ShareMode): Promise<ShareLink | undefined> {
+  async createShareLink(dossierId: string, mode: ShareMode, expiresAt?: string): Promise<ShareLink | undefined> {
     const dossier = await dossierService.getDossier(dossierId);
     if (!dossier) return undefined;
 
@@ -33,6 +33,8 @@ export const shareService = {
       shareToken: randomToken(`${dossier.slug}-${mode}`),
       mode,
       isActive: true,
+      expiresAt,
+      viewCount: 0,
       createdAt: new Date().toISOString()
     };
 
@@ -55,15 +57,46 @@ export const shareService = {
     return updated.shareLinks.find((link) => link.id === linkId);
   },
 
+  async updateShareLink(dossierId: string, linkId: string, patch: Partial<ShareLink>) {
+    const dossier = await dossierService.getDossier(dossierId);
+    if (!dossier) return undefined;
+
+    const updated = {
+      ...dossier,
+      shareLinks: dossier.shareLinks.map((link) =>
+        link.id === linkId ? { ...link, ...patch } : link
+      )
+    };
+
+    await dossierService.updateDossier(updated);
+    return updated.shareLinks.find((link) => link.id === linkId);
+  },
+
   async getSharedDossier(shareToken: string): Promise<SharedDossierResult | undefined> {
     const dossiers = await dossierService.listDossiers();
     for (const dossier of dossiers) {
       const shareLink = dossier.shareLinks.find(
-        (link) => link.shareToken === shareToken && link.isActive
+        (link) =>
+          link.shareToken === shareToken &&
+          link.isActive &&
+          (!link.expiresAt || new Date(link.expiresAt).getTime() > Date.now())
       );
       if (shareLink) return { dossier, shareLink };
     }
 
     return undefined;
+  },
+
+  async recordView(shareToken: string): Promise<SharedDossierResult | undefined> {
+    const result = await this.getSharedDossier(shareToken);
+    if (!result) return undefined;
+
+    const updatedLink = {
+      ...result.shareLink,
+      viewCount: (result.shareLink.viewCount ?? 0) + 1
+    };
+    const updatedDossier = withUpdatedShareLink(result.dossier, updatedLink);
+    await dossierService.updateDossier(updatedDossier);
+    return { dossier: updatedDossier, shareLink: updatedLink };
   }
 };

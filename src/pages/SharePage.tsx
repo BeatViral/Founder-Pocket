@@ -6,6 +6,7 @@ import { Card } from "../components/ui/Card";
 import { Markdown } from "../components/ui/Markdown";
 import { ScoreBar } from "../components/ui/ScoreBar";
 import { shareModeLabels } from "../lib/format";
+import { analyticsService } from "../services/analyticsService";
 import { shareService } from "../services/shareService";
 import type { DossierSectionType, ShareMode, SharedDossierResult } from "../types";
 
@@ -37,7 +38,12 @@ export default function SharePage({ mode }: { mode?: ShareMode }) {
   const [result, setResult] = useState<SharedDossierResult | undefined>();
 
   useEffect(() => {
-    if (shareToken) shareService.getSharedDossier(shareToken).then(setResult);
+    if (shareToken) {
+      shareService.recordView(shareToken).then((next) => {
+        setResult(next);
+        if (next) analyticsService.track("share_link_viewed", { token: shareToken, mode: next.shareLink.mode });
+      });
+    }
   }, [shareToken]);
 
   const activeMode = mode ?? result?.shareLink.mode ?? "full";
@@ -64,11 +70,12 @@ export default function SharePage({ mode }: { mode?: ShareMode }) {
   }
 
   return (
-    <main className="min-h-screen bg-ink px-4 py-8 text-white sm:px-6">
+    <main className="min-h-screen bg-ink px-4 py-8 text-white sm:px-6 print-container print-footer">
       <div className="mx-auto max-w-5xl">
         <header className="mb-6 rounded-lg border border-white/12 bg-white/[0.06] p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <Badge tone="info">{shareModeLabels[activeMode]}</Badge>
+            <span className="text-sm text-slate-400">{result.shareLink.viewCount ?? 0} views</span>
             <Button variant="secondary" onClick={() => window.print()}>
               Print / Save as PDF
             </Button>

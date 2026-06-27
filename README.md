@@ -4,118 +4,191 @@
 
 Observation-to-business engine for turning things people notice into business angles, proof checks, startup dossiers, MVP build briefs, and validation plans.
 
+Founder Pocket keeps the front door simple. The user starts with an observation. Everything serious happens after the scan: business angles, proof checks, Founder Fit, validation work, dossiers, share modes, and exports.
+
 Founder Pocket doesn't just analyse the idea. It analyses whether this is the right opportunity for you.
 
-## Features
+## Current Mode
 
-- Human-first landing page with observation input
-- Optional Founder Lens input that adapts business angles to the user's background, credibility, skills, access, and validation path
+The app runs fully in local/demo mode today:
+
+- React, TypeScript, Vite, Tailwind CSS, React Router
+- LocalStorage persistence
+- Mock auth with guest, user, and admin roles
+- Local analytics events
+- Demo share links
+- Deterministic generation/scoring fallback
+
+The SaaS layer is scaffolded but not connected to a live database in this repo.
+
+## Product Flow
+
+Observation -> Business Scan -> Business Angles -> Proof Check -> Startup Dossier -> Save/Edit/Share/Export.
+
+The homepage should stay plain and human. Startup, investor, accelerator, dossier, scoring, and export language belongs after the scan.
+
+## MVP Features
+
+- Human-first observation input
+- Optional Founder Lens input after the user starts the scan
 - Business Scan with signal classification and Business Potential Score
-- 3-5 deterministic business angles per scan, adapted by founder fit when context is available
-- Proof Check with plain-language and founder-adaptive validation questions
-- Founder Fit Engine with profile, insight, behaviour, score, and adaptation layers
-- Founder Psychology profile with motivation, risk, decision style, habits, and learning-loop signals
-- Founder-Market Fit extraction with lived experience, customer access, unfair insight, credibility, and persistence scoring
-- Startup Dossier generator with:
-  - One-page business snapshot
-  - Full startup dossier
-  - Founder Fit Engine section
-  - Founder psychology section
-  - Founder-market fit section
-  - Accelerator-style answers
-  - Advisor FAQ
-  - MVP build brief
-  - Validation sprint
-  - Founder video script
-  - Outreach email
-  - Data room checklist
-  - Missing proof list
-- Startup Readiness Score
-- Dashboard for saved scans and dossiers
+- Founder-adapted business angle ranking
+- Proof Check with adaptive validation questions
+- Founder Fit Engine with archetype, behaviour mode, insight types, fit score, recommended path, and tone adaptation
+- Founder psychology and founder-market fit sections
+- Startup dossier generator
 - Editable dossier sections
-- Interactive validation tracker for 14-day and 30-day proof tasks
+- Interactive validation tracker with notes and evidence links
+- Dashboard workspace
+- Admin dashboard fed by local analytics
 - Demo share links with full, investor, builder, and accelerator modes
-- Copy actions and JSON download
-- Browser print/save-as-PDF export
-- LocalStorage persistence with service boundaries for a future backend
+- Copy actions, JSON download, export-pack download, and browser print/save-as-PDF
 
-## Tech Stack
+## SaaS Foundation Added
 
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- React Router
-- LocalStorage service adapter
-- Mock deterministic generation and scoring services
+- `prisma/schema.prisma` with production data model
+- `server/` Express API scaffold
+- Auth route structure
+- User/founder profile route structure
+- Observations, scans, angles, proof checks, dossiers, sections, validation, share links, exports, AI, analytics, and admin route structure
+- Server-side AI provider shell
+- Prompt templates in `server/prompts/`
+- Frontend `apiClient` for every planned route
+- Frontend `authService`, `analyticsService`, `aiClient`, `exportService`, and `founderFitService`
+- `.env.example` and `server/.env.example`
+- GitHub Actions CI for typecheck and build
 
 ## Local Setup
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open the local URL printed by Vite.
 
-## Build
+## Frontend Scripts
 
 ```bash
-npm run build
-npm run preview
+pnpm typecheck
+pnpm build
+pnpm preview
 ```
 
-## Deployment
+## Local vs Production Mode
 
-This app is frontend-only and can deploy to Vercel, Netlify, or GitHub Pages.
+Local/demo mode is the default:
 
-GitHub Pages is currently compatible with branch-based Pages hosting. The production Vite build uses `/Founder-Pocket/` as its base path, and the built `assets/` files are committed at the repository root so `https://beatviral.github.io/Founder-Pocket/` can serve the app directly.
+```env
+VITE_APP_MODE=local
+VITE_ENABLE_BACKEND=false
+VITE_API_BASE_URL=http://localhost:8787/api
+```
 
-## Future Supabase Setup
+When `VITE_ENABLE_BACKEND=true`, frontend service clients are ready to call the backend API. Until the server is fully implemented, keep local mode on.
 
-The current app uses `src/services/storageService.ts`. A Supabase adapter can replace it without rewriting the UI.
+## Backend Setup
 
-Suggested tables:
+The backend scaffold lives in `server/`.
 
-- `users`
-- `observations`
-- `business_scans`
-- `business_angles`
-- `proof_answers`
-- `startup_dossiers`
-- `dossier_sections`
-- `share_links`
-- `validation_tasks`
+```bash
+pnpm --dir server install
+pnpm backend:dev
+```
 
-## Future AI API Setup
+Backend environment:
 
-The deterministic generation logic lives in `src/services/generationService.ts`, and scoring lives in `src/services/scoringService.ts`. A future AI service can replace or augment:
+```env
+PORT=8787
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/founder_pocket
+JWT_SECRET=replace-with-a-long-random-secret
+CORS_ORIGIN=http://localhost:5173
+AI_PROVIDER=mock
+AI_MODEL=mock-founder-pocket
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
+```
 
-- `generateBusinessScan`
-- `generateBusinessAngles`
-- `generateStartupDossier`
-- `generateAcceleratorAnswers`
-- `generateBuildBrief`
-- `generateValidationSprint`
-- `analyzeFounderFitEngine`
-- `analyzeFounderPsychology`
-- `analyzeFounderMarketFit`
+## Database
 
-Do not expose API keys in the frontend. Use serverless functions or a backend service for real AI calls.
+Prisma schema:
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+```
+
+Core models include:
+
+- User
+- FounderProfile
+- Observation
+- BusinessScan
+- BusinessAngle
+- ProofCheck
+- ProofAnswer
+- StartupDossier
+- DossierSection
+- ValidationTask
+- ShareLink
+- ShareView
+- ExportRecord
+- AnalyticsEvent
+- AdminSetting
+- AIJob
+
+## AI Architecture
+
+All future AI calls should run server-side through:
+
+- `server/src/services/aiProvider.ts`
+- `server/prompts/*`
+- `/api/ai/*` routes
+
+If no provider key exists, use mock/deterministic generation. Do not expose AI keys in the frontend.
+
+Generation rules:
+
+- Plain, grounded language
+- No fake proof
+- No guaranteed outcomes
+- Always include missing proof
+- Always include risks
+- Always include a next action
+
+## Deployment Notes
+
+GitHub Pages:
+
+- Production Vite build uses `/Founder-Pocket/` as base path.
+- Built `assets/` files are committed at the repository root for Pages hosting.
+
+Vercel/Netlify:
+
+- Use `pnpm build`.
+- Serve `dist`.
+- Keep backend disabled unless deploying API separately.
+
+Render/Railway/VPS backend:
+
+- Deploy `server/`.
+- Add Postgres.
+- Set `DATABASE_URL`, `JWT_SECRET`, CORS origin, and AI provider variables.
+- Run Prisma migrations before enabling production mode.
 
 ## Roadmap
 
-- Real auth
-- Supabase persistence
-- Server-side share links
-- AI-assisted generation
-- PDF rendering service
-- Stripe billing
-- Team workspaces
-- Validation task updates that recalculate readiness
+- Replace route stubs with Prisma-backed controllers
+- Add real JWT/session middleware
+- Add password hashing and provider auth
+- Add server-rendered PDF generation
+- Add file uploads for validation evidence
+- Add billing/workspaces
+- Add production analytics aggregation
+- Add backend-driven public share links
 
 ## Positioning
 
-Founder Pocket does not promise acceptance or success. It helps turn a real observation into business angles, proof questions, and a serious startup dossier worth improving.
+Founder Pocket does not promise acceptance or success. It helps turn a real observation into business angles, proof questions, founder-fit analysis, validation tasks, and a serious startup dossier worth improving.
 
 Demo share links are stored locally. Real public links require backend storage.

@@ -6,9 +6,12 @@ import { BusinessAngleCard } from "../components/scan/BusinessAngleCard";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
+import { FieldLabel, Textarea } from "../components/ui/FormControls";
 import { SaveGate, useUserProfile } from "../components/ui/SaveGate";
 import { ScoreBar } from "../components/ui/ScoreBar";
 import { statusTone } from "../lib/format";
+import { analyticsService } from "../services/analyticsService";
+import { generateBusinessScan } from "../services/generationService";
 import { analyzeFounderFitEngine } from "../services/scoringService";
 import { storageService } from "../services/storageService";
 import type { BusinessScan } from "../types";
@@ -20,9 +23,15 @@ export default function BusinessScanPage() {
   const [scan, setScan] = useState<BusinessScan | undefined>();
   const [gateOpen, setGateOpen] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
+  const [founderLensDraft, setFounderLensDraft] = useState("");
 
   useEffect(() => {
-    if (id) storageService.getScan(id).then(setScan);
+    if (id) {
+      storageService.getScan(id).then((next) => {
+        setScan(next);
+        setFounderLensDraft(next?.observationInput.founderContext ?? "");
+      });
+    }
   }, [id]);
 
   const founderFit = useMemo(
@@ -50,6 +59,23 @@ export default function BusinessScanPage() {
       setScan(saved);
       setPendingSave(false);
     }
+  };
+
+  const applyFounderLens = async () => {
+    const updatedInput = {
+      ...scan.observationInput,
+      founderContext: founderLensDraft
+    };
+    const rescored = generateBusinessScan(updatedInput);
+    const updatedScan: BusinessScan = {
+      ...rescored,
+      id: scan.id,
+      saved: scan.saved,
+      createdAt: scan.createdAt,
+      updatedAt: new Date().toISOString()
+    };
+    const saved = await storageService.saveScan(updatedScan);
+    setScan(saved);
   };
 
   const download = () => {
@@ -123,7 +149,10 @@ export default function BusinessScanPage() {
                   key={angle.id}
                   angle={angle}
                   onSave={save}
-                  onProof={() => navigate(`/proof-check/${scan.id}?angle=${angle.id}`)}
+                  onProof={async () => {
+                    await analyticsService.track("angle_selected", { scanId: scan.id, angleId: angle.id, angleName: angle.name });
+                    navigate(`/proof-check/${scan.id}?angle=${angle.id}`);
+                  }}
                 />
               ))}
             </div>
@@ -144,6 +173,24 @@ export default function BusinessScanPage() {
             </div>
           </Card>
           <FounderFitCard profile={founderFit} compact />
+          <Card className="p-5">
+            <h2 className="font-bold">Founder Lens</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Add your role, background, skills, access, or why you noticed this. Founder Pocket will rescore the angles around you.
+            </p>
+            <div className="mt-4">
+              <FieldLabel label="Your connection to this">
+                <Textarea
+                  value={founderLensDraft}
+                  onChange={(event) => setFounderLensDraft(event.target.value)}
+                  placeholder="I'm a clinic admin / builder / creator / operator / patient / teacher..."
+                />
+              </FieldLabel>
+            </div>
+            <Button className="mt-4" fullWidth variant="secondary" onClick={applyFounderLens}>
+              Update Founder Fit
+            </Button>
+          </Card>
           <Card className="p-5">
             <h2 className="font-bold">Recommended next step</h2>
             <p className="mt-2 text-sm leading-6 text-slate-300">{scan.potentialScore.recommendedNextStep}</p>

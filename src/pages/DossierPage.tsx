@@ -12,7 +12,9 @@ import { CopyButton } from "../components/ui/CopyButton";
 import { SaveGate, useUserProfile } from "../components/ui/SaveGate";
 import { ScoreBar } from "../components/ui/ScoreBar";
 import { statusTone } from "../lib/format";
+import { analyticsService } from "../services/analyticsService";
 import { dossierService } from "../services/dossierService";
+import { exportService } from "../services/exportService";
 import type { DossierSectionType, StartupDossier } from "../types";
 
 const sectionLabels: Record<DossierSectionType, string> = {
@@ -79,28 +81,23 @@ export default function DossierPage() {
   };
 
   const print = () => {
-    if (requireProfile("export")) window.print();
+    if (requireProfile("export")) exportService.printPdf(dossier);
   };
 
   const downloadJson = () => {
     if (!requireProfile("export")) return;
-    const blob = new Blob([JSON.stringify(dossier, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${dossier.slug}-dossier.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    exportService.downloadJson(dossier);
   };
 
   const onGateSaved = () => {
     if (pendingAction === "share") setShareOpen(true);
-    if (pendingAction === "export") window.print();
+    if (pendingAction === "export") exportService.printPdf(dossier);
     setPendingAction(null);
   };
 
   const saveSection = async (section: typeof activeSection) => {
     const updated = await dossierService.updateSection(dossier.id, section);
+    await analyticsService.track("section_edited", { dossierId: dossier.id, sectionType: section.type });
     if (updated) setDossier(updated);
   };
 
@@ -108,13 +105,21 @@ export default function DossierPage() {
     dossier.sections.find((section) => section.type === type)?.content ?? "";
 
   return (
-    <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 print-container">
+    <main className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 print-container print-footer">
       <header className="no-print mb-6 rounded-lg border border-white/12 bg-white/[0.06] p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <Badge tone={statusTone(dossier.status)}>{dossier.status}</Badge>
             <h1 className="mt-3 text-3xl font-black md:text-5xl">{dossier.startupName}</h1>
             <p className="mt-3 max-w-3xl text-slate-300">{dossier.oneLiner}</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-sm text-slate-300">
+              <span className="rounded-md border border-white/10 bg-white/[0.05] px-3 py-1.5">
+                Readiness {dossier.readinessScore.total}/100
+              </span>
+              <span className="rounded-md border border-white/10 bg-white/[0.05] px-3 py-1.5">
+                Founder Fit {dossier.founderFitEngine?.fitScore ?? 0}/100
+              </span>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" onClick={openShare} icon={<Share2 size={16} />}>
@@ -198,6 +203,9 @@ export default function DossierPage() {
               <CopyButton text={getSectionText("outreach_email")} label="Copy Outreach Email" />
               <Button variant="secondary" onClick={downloadJson} icon={<FileJson size={16} />}>
                 Download JSON
+              </Button>
+              <Button variant="secondary" onClick={() => exportService.downloadExportPack(dossier)} icon={<Download size={16} />}>
+                Download Export Pack
               </Button>
               <Button variant="secondary" onClick={print} icon={<Download size={16} />}>
                 Print / Save as PDF

@@ -1,6 +1,7 @@
 import { FileText } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { FounderFitCard } from "../components/founder/FounderFitCard";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -12,7 +13,8 @@ import {
   generateProofCheckQuestions,
   generateStartupDossier
 } from "../services/generationService";
-import { calculateStartupReadinessScore } from "../services/scoringService";
+import { analyticsService } from "../services/analyticsService";
+import { analyzeFounderFitEngine, calculateStartupReadinessScore } from "../services/scoringService";
 import { storageService } from "../services/storageService";
 import type { BusinessAngle, BusinessScan } from "../types";
 
@@ -26,7 +28,10 @@ export default function ProofCheckPage() {
   const [gateOpen, setGateOpen] = useState(false);
 
   useEffect(() => {
-    if (id) storageService.getScan(id).then(setScan);
+    if (id) {
+      analyticsService.track("proof_check_started", { scanId: id });
+      storageService.getScan(id).then(setScan);
+    }
   }, [id]);
 
   const selectedAngle: BusinessAngle | undefined = useMemo(() => {
@@ -46,6 +51,8 @@ export default function ProofCheckPage() {
     scan && selectedAngle
       ? calculateStartupReadinessScore(scan.observationInput, selectedAngle, proofAnswers)
       : undefined;
+  const founderFit =
+    scan && selectedAngle ? analyzeFounderFitEngine(scan.observationInput, selectedAngle, proofAnswers) : undefined;
 
   if (!scan || !selectedAngle) {
     return (
@@ -61,6 +68,8 @@ export default function ProofCheckPage() {
     const dossier = generateStartupDossier(scan, selectedAngle, proofAnswers);
     await storageService.saveScan({ ...scan, saved: true });
     await storageService.saveDossier(dossier);
+    await analyticsService.track("proof_check_completed", { scanId: scan.id, angleId: selectedAngle.id });
+    await analyticsService.track("dossier_generated", { dossierId: dossier.id, scanId: scan.id });
     navigate(`/app/dossier/${dossier.id}`);
   };
 
@@ -139,6 +148,7 @@ export default function ProofCheckPage() {
               </>
             ) : null}
           </Card>
+          <FounderFitCard profile={founderFit} compact />
           <Card className="p-5">
             <h2 className="text-lg font-bold">Generate Dossier</h2>
             <p className="mt-2 text-sm leading-6 text-slate-300">

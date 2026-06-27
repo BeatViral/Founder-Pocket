@@ -1,4 +1,5 @@
 export type ShareMode = "full" | "investor" | "builder" | "accelerator";
+export type UserRole = "user" | "admin";
 
 export type WhereNoticed =
   | "Work"
@@ -94,7 +95,31 @@ export type UserProfile = {
   id: string;
   name: string;
   email: string;
+  role: UserRole;
   createdAt: string;
+};
+
+export type FounderProfile = {
+  id: string;
+  userId: string;
+  background: string;
+  roleType: string;
+  industry: string;
+  yearsExperience: number;
+  strengths: string[];
+  communicationStyle: string;
+  riskComfort: string;
+  validationComfort: string;
+  technicalAbility: string;
+  networkAccess: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AuthSession = {
+  user: UserProfile;
+  mode: "guest" | "mock" | "backend";
+  token?: string;
 };
 
 export type ObservationInput = {
@@ -329,8 +354,14 @@ export type ValidationTask = {
   title: string;
   description: string;
   phase: "14-day" | "30-day";
-  status: "todo" | "doing" | "done";
+  status: "todo" | "doing" | "done" | "blocked";
   evidenceHint?: string;
+  evidenceType?: string;
+  evidenceUrl?: string;
+  notes?: string;
+  dueDate?: string;
+  proofImpact?: string;
+  linkedReadinessCategory?: string;
 };
 
 export type DossierSection = {
@@ -348,6 +379,16 @@ export type ShareLink = {
   shareToken: string;
   mode: ShareMode;
   isActive: boolean;
+  expiresAt?: string;
+  viewCount?: number;
+  createdAt: string;
+};
+
+export type AnalyticsEvent = {
+  id: string;
+  userId?: string;
+  eventName: string;
+  properties: Record<string, unknown>;
   createdAt: string;
 };
 
@@ -377,6 +418,8 @@ export type AppData = {
   scans: BusinessScan[];
   dossiers: StartupDossier[];
   userProfile?: UserProfile;
+  founderProfile?: FounderProfile;
+  analyticsEvents?: AnalyticsEvent[];
 };
 
 export type SharedDossierResult = {

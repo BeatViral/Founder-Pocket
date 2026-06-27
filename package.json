@@ -8,7 +8,12 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "backend:dev": "pnpm --dir server dev",
+    "backend:build": "pnpm --dir server build",
+    "db:generate": "pnpm --dir server prisma:generate",
+    "db:migrate": "pnpm --dir server prisma:migrate"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

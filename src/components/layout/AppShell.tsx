@@ -1,6 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
 import { Button } from "../ui/Button";
-import { FolderOpen, Plus } from "lucide-react";
+import { FolderOpen, Plus, User } from "lucide-react";
 
 export function AppShell() {
   return (
@@ -20,6 +20,11 @@ export function AppShell() {
             <Link to="/app/dashboard">
               <Button variant="secondary" icon={<FolderOpen size={16} />}>
                 Dashboard
+              </Button>
+            </Link>
+            <Link to="/account">
+              <Button variant="secondary" icon={<User size={16} />}>
+                Account
               </Button>
             </Link>
             <Link to="/scan">

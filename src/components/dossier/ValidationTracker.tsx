@@ -1,7 +1,9 @@
-import { CheckCircle2, Circle, ListChecks, PlayCircle } from "lucide-react";
+import { Ban, CheckCircle2, Circle, Link as LinkIcon, ListChecks, PlayCircle } from "lucide-react";
+import { analyticsService } from "../../services/analyticsService";
 import { dossierService } from "../../services/dossierService";
 import type { StartupDossier, ValidationTask } from "../../types";
 import { Card } from "../ui/Card";
+import { Input, Textarea } from "../ui/FormControls";
 
 const statusOptions: Array<{
   value: ValidationTask["status"];
@@ -10,7 +12,8 @@ const statusOptions: Array<{
 }> = [
   { value: "todo", label: "To do", icon: Circle },
   { value: "doing", label: "Doing", icon: PlayCircle },
-  { value: "done", label: "Done", icon: CheckCircle2 }
+  { value: "done", label: "Done", icon: CheckCircle2 },
+  { value: "blocked", label: "Blocked", icon: Ban }
 ];
 
 export function ValidationTracker({
@@ -26,6 +29,12 @@ export function ValidationTracker({
 
   const updateStatus = async (taskId: string, status: ValidationTask["status"]) => {
     const updated = await dossierService.updateValidationTask(dossier.id, taskId, status);
+    if (updated) onUpdated(updated);
+    if (status === "done") await analyticsService.track("validation_task_completed", { dossierId: dossier.id, taskId });
+  };
+
+  const updateTask = async (taskId: string, patch: Partial<ValidationTask>) => {
+    const updated = await dossierService.updateValidationTaskFields(dossier.id, taskId, patch);
     if (updated) onUpdated(updated);
   };
 
@@ -43,6 +52,11 @@ export function ValidationTracker({
       <div className="mb-5 h-2 overflow-hidden rounded-full bg-white/10">
         <div className="h-full rounded-full bg-signal" style={{ width: `${progress}%` }} />
       </div>
+      <div className="mb-5 grid gap-2 text-xs text-slate-400">
+        <span>Weekly proof summary: {doneCount ? `${doneCount} task signals collected.` : "No proof collected yet."}</span>
+        <span>Decisions made: update each task with notes before changing the dossier.</span>
+        <span>Next proof gap: {tasks.find((task) => task.status !== "done")?.title ?? "No open gap."}</span>
+      </div>
       <div className="space-y-4">
         {(["14-day", "30-day"] as const).map((phase) => {
           const phaseTasks = tasks.filter((task) => task.phase === phase);
@@ -59,7 +73,7 @@ export function ValidationTracker({
                     {task.evidenceHint ? (
                       <p className="mt-2 text-xs leading-5 text-slate-500">Evidence: {task.evidenceHint}</p>
                     ) : null}
-                    <div className="mt-3 grid grid-cols-3 gap-1">
+                    <div className="mt-3 grid grid-cols-2 gap-1">
                       {statusOptions.map((option) => {
                         const Icon = option.icon;
                         const active = task.status === option.value;
@@ -81,6 +95,31 @@ export function ValidationTracker({
                           </button>
                         );
                       })}
+                    </div>
+                    <div className="mt-3 grid gap-2">
+                      <Textarea
+                        value={task.notes ?? ""}
+                        onChange={(event) => updateTask(task.id, { notes: event.target.value })}
+                        placeholder="Notes, interview log, decisions made..."
+                        className="min-h-20 text-xs"
+                      />
+                      <div className="grid gap-2 md:grid-cols-[1fr_auto]">
+                        <Input
+                          value={task.evidenceUrl ?? ""}
+                          onChange={(event) => updateTask(task.id, { evidenceUrl: event.target.value })}
+                          placeholder="Evidence link or file placeholder"
+                          className="text-xs"
+                        />
+                        <div className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-white/10 px-3 text-xs text-slate-400">
+                          <LinkIcon size={14} />
+                          Evidence
+                        </div>
+                      </div>
+                      {task.proofImpact || task.linkedReadinessCategory ? (
+                        <p className="text-xs leading-5 text-slate-500">
+                          Impact: {task.proofImpact ?? "Readiness proof"} · {task.linkedReadinessCategory ?? "general"}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 ))}

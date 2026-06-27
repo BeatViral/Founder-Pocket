@@ -1,5 +1,6 @@
 import { Check, Copy, RefreshCw, SquarePen } from "lucide-react";
 import { useEffect, useState } from "react";
+import { analyticsService } from "../../services/analyticsService";
 import type { DossierSection as DossierSectionType } from "../../types";
 import { Button } from "../ui/Button";
 import { Markdown } from "../ui/Markdown";
@@ -22,6 +23,7 @@ export function EditableSection({
 
   const copy = async () => {
     await navigator.clipboard.writeText(section.content);
+    await analyticsService.track("section_copied", { sectionType: section.type, title: section.title });
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1400);
   };

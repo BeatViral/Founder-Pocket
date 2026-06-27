@@ -28,8 +28,14 @@ export function PublicLayout() {
             <Link to="/examples" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white lg:block">
               Examples
             </Link>
+            <Link to="/privacy" className="hidden px-3 py-2 text-sm text-slate-300 hover:text-white xl:block">
+              Privacy
+            </Link>
             <Link to="/app/dashboard">
               <Button variant="secondary">Dashboard</Button>
+            </Link>
+            <Link to="/login" className="hidden sm:inline-flex">
+              <Button variant="secondary">Log in</Button>
             </Link>
             <Link to="/scan">
               <Button>Scan</Button>

@@ -14,6 +14,7 @@ import {
   whereNoticedOptions
 } from "../services/generationService";
 import { storageService } from "../services/storageService";
+import { analyticsService } from "../services/analyticsService";
 import type { DesiredOutcome, IdeaState, WhereNoticed } from "../types";
 
 type LocationState = { observationText?: string };
@@ -24,7 +25,6 @@ export default function ScanPage() {
   const state = location.state as LocationState | null;
   const [observationText, setObservationText] = useState(state?.observationText ?? "");
   const [optionalContext, setOptionalContext] = useState("");
-  const [founderContext, setFounderContext] = useState("");
   const [whereNoticed, setWhereNoticed] = useState<WhereNoticed>("Work");
   const [ideaState, setIdeaState] = useState<IdeaState>("No, just checking");
   const [desiredOutcome, setDesiredOutcome] = useState<DesiredOutcome>("Just scan for possibilities");
@@ -43,13 +43,14 @@ export default function ScanPage() {
     const input = createObservationInput({
       observationText,
       optionalContext,
-      founderContext,
       whereNoticed,
       ideaState,
       desiredOutcome
     });
+    await analyticsService.track("observation_submitted", { whereNoticed, desiredOutcome });
     const scan = generateBusinessScan(input);
     await storageService.saveScan(scan);
+    await analyticsService.track("scan_generated", { scanId: scan.id, status: scan.status });
     window.setTimeout(() => navigate(`/app/scan/${scan.id}`), 650);
   };
 
@@ -87,9 +88,6 @@ export default function ScanPage() {
           <p className="mt-4 text-sm text-slate-400">
             Not every observation is a business. Founder Pocket helps you find the ones that might be.
           </p>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400">
-            Founder Pocket doesn't just analyse the idea. It analyses whether this is the right opportunity for you.
-          </p>
         </div>
         <Card className="p-5 md:p-7">
           <form className="space-y-5" onSubmit={submit}>
@@ -104,16 +102,6 @@ export default function ScanPage() {
             </FieldLabel>
             <FieldLabel label="Optional context" helper="Add where you saw it, who was involved, or why it stood out.">
               <Textarea value={optionalContext} onChange={(event) => setOptionalContext(event.target.value)} />
-            </FieldLabel>
-            <FieldLabel
-              label="Your connection to this"
-              helper="Optional: role, background, skills, access, or why you are the person who noticed it."
-            >
-              <Textarea
-                value={founderContext}
-                onChange={(event) => setFounderContext(event.target.value)}
-                placeholder="I'm a clinic admin / builder / creator / operator / patient / teacher..."
-              />
             </FieldLabel>
             <div className="grid gap-4 md:grid-cols-3">
               <FieldLabel label="Where did you notice it?">
@@ -143,22 +131,6 @@ export default function ScanPage() {
             </Button>
           </form>
         </Card>
-
-        <div className="mt-5 grid gap-3 md:grid-cols-4">
-          {[
-            ["1", "Type an observation"],
-            ["2", "Get business angles"],
-            ["3", "Proof-check the best one"],
-            ["4", "Generate a startup dossier"]
-          ].map(([step, label]) => (
-            <div key={step} className="rounded-lg border border-white/10 bg-white/[0.06] p-4">
-              <div className="mb-3 grid h-8 w-8 place-items-center rounded-md bg-signal text-sm font-black text-slate-950">
-                {step}
-              </div>
-              <p className="text-sm font-semibold text-slate-100">{label}</p>
-            </div>
-          ))}
-        </div>
 
         <div className="mt-6 rounded-lg border border-white/10 bg-white/[0.05] p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">

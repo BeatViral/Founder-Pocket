@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { analyticsService } from "../../services/analyticsService";
+import { authService } from "../../services/authService";
 import { storageService } from "../../services/storageService";
 import type { UserProfile } from "../../types";
 import { Button } from "./Button";
@@ -16,9 +18,9 @@ export function useUserProfile() {
   return {
     profile,
     async saveProfile(value: { name: string; email: string }) {
-      const saved = await storageService.saveUserProfile(value);
-      setProfile(saved);
-      return saved;
+      const session = await authService.signup(value);
+      setProfile(session.user);
+      return session.user;
     }
   };
 }
@@ -38,7 +40,9 @@ export function SaveGate({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    await analyticsService.track("signup_started", { source: "save_gate" });
     await saveProfile({ name, email });
+    await analyticsService.track("signup_completed", { source: "save_gate" });
     onSaved();
     onClose();
   };

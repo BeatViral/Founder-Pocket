@@ -1,5 +1,6 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+import { analyticsService } from "../../services/analyticsService";
 import { Button } from "./Button";
 
 export function CopyButton({
@@ -15,6 +16,7 @@ export function CopyButton({
 
   const copy = async () => {
     await navigator.clipboard.writeText(text);
+    await analyticsService.track("section_copied", { label });
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
   };
