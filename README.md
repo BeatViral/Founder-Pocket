@@ -21,6 +21,16 @@ The app runs fully in local/demo mode today:
 
 The SaaS layer is scaffolded but not connected to a live database in this repo.
 
+Supabase mode is supported when the browser build receives:
+
+```env
+VITE_APP_MODE=supabase
+VITE_SUPABASE_URL=https://iuclrqbipbisixlkobee.supabase.co
+VITE_SUPABASE_ANON_KEY=your-publishable-anon-key
+```
+
+Do not put a direct Postgres connection string or any `service_role` key in frontend code.
+
 ## Product Flow
 
 Observation -> Business Scan -> Business Angles -> Proof Check -> Startup Dossier -> Save/Edit/Share/Export.
@@ -117,6 +127,18 @@ Prisma schema:
 pnpm db:generate
 pnpm db:migrate
 ```
+
+Supabase project:
+
+```bash
+supabase login
+supabase init
+supabase link --project-ref iuclrqbipbisixlkobee
+supabase db push
+```
+
+The Supabase SQL migration lives in `supabase/migrations/202606280001_founder_pocket_schema.sql`.
+It creates the app tables, JSON payload columns for the current local-first object model, RLS policies, and public read policies for active share links.
 
 Core models include:
 

@@ -1,0 +1,13 @@
+project_id = "iuclrqbipbisixlkobee"
+
+[api]
+enabled = true
+schemas = ["public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[auth]
+enabled = true
+
+[db]
+major_version = 15

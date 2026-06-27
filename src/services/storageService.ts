@@ -1,4 +1,6 @@
 import { sampleDossiers, sampleScans } from "../lib/sampleData";
+import { isSupabaseConfigured } from "./supabaseClient";
+import { supabaseStorageService } from "./supabaseStorageService";
 import type { AnalyticsEvent, AppData, BusinessScan, FounderProfile, StartupDossier, UserProfile } from "../types";
 
 const DATA_KEY = "founder-pocket:observation-engine:data";
@@ -44,7 +46,7 @@ function writeData(data: AppData) {
   window.localStorage.setItem(DATA_KEY, JSON.stringify(data));
 }
 
-export const storageService = {
+const localStorageService = {
   async getUserProfile() {
     return readData().userProfile;
   },
@@ -160,5 +162,131 @@ export const storageService = {
       analyticsEvents: [event, ...(data.analyticsEvents ?? [])].slice(0, 500)
     });
     return event;
+  }
+};
+
+async function withFallback<T>(supabaseCall: () => Promise<T>, localCall: () => Promise<T>): Promise<T> {
+  if (isSupabaseConfigured()) {
+    try {
+      return await supabaseCall();
+    } catch (error) {
+      console.warn("Supabase unavailable, using local demo storage.", error);
+    }
+  }
+
+  return localCall();
+}
+
+export const storageService = {
+  getUserProfile() {
+    return withFallback(
+      () => supabaseStorageService.getUserProfile(),
+      () => localStorageService.getUserProfile()
+    );
+  },
+
+  saveUserProfile(profile: Omit<UserProfile, "id" | "createdAt"> & { role?: UserProfile["role"] }) {
+    return withFallback(
+      () => supabaseStorageService.saveUserProfile(profile),
+      () => localStorageService.saveUserProfile(profile)
+    );
+  },
+
+  clearUserProfile() {
+    return withFallback(
+      () => supabaseStorageService.clearUserProfile(),
+      () => localStorageService.clearUserProfile()
+    );
+  },
+
+  getFounderProfile() {
+    return withFallback(
+      () => supabaseStorageService.getFounderProfile(),
+      () => localStorageService.getFounderProfile()
+    );
+  },
+
+  saveFounderProfile(profile: Omit<FounderProfile, "id" | "userId" | "createdAt" | "updatedAt">) {
+    return withFallback(
+      () => supabaseStorageService.saveFounderProfile(profile),
+      () => localStorageService.saveFounderProfile(profile)
+    );
+  },
+
+  listScans() {
+    return withFallback(
+      () => supabaseStorageService.listScans(),
+      () => localStorageService.listScans()
+    );
+  },
+
+  getScan(id: string) {
+    return withFallback(
+      () => supabaseStorageService.getScan(id),
+      () => localStorageService.getScan(id)
+    );
+  },
+
+  saveScan(scan: BusinessScan) {
+    return withFallback(
+      () => supabaseStorageService.saveScan(scan),
+      () => localStorageService.saveScan(scan)
+    );
+  },
+
+  deleteScan(id: string) {
+    return withFallback(
+      () => supabaseStorageService.deleteScan(id),
+      () => localStorageService.deleteScan(id)
+    );
+  },
+
+  listDossiers() {
+    return withFallback(
+      () => supabaseStorageService.listDossiers(),
+      () => localStorageService.listDossiers()
+    );
+  },
+
+  getDossier(id: string) {
+    return withFallback(
+      () => supabaseStorageService.getDossier(id),
+      () => localStorageService.getDossier(id)
+    );
+  },
+
+  saveDossier(dossier: StartupDossier) {
+    return withFallback(
+      () => supabaseStorageService.saveDossier(dossier),
+      () => localStorageService.saveDossier(dossier)
+    );
+  },
+
+  deleteDossier(id: string) {
+    return withFallback(
+      () => supabaseStorageService.deleteDossier(id),
+      () => localStorageService.deleteDossier(id)
+    );
+  },
+
+  exportAll() {
+    return withFallback(
+      () => supabaseStorageService.exportAll(),
+      () => localStorageService.exportAll()
+    );
+  },
+
+  listAnalyticsEvents() {
+    return withFallback(
+      () => supabaseStorageService.listAnalyticsEvents(),
+      () => localStorageService.listAnalyticsEvents()
+    );
+  },
+
+  saveAnalyticsEvent(event: AnalyticsEvent) {
+    return withFallback(
+      () => supabaseStorageService.saveAnalyticsEvent(event),
+      () => localStorageService.saveAnalyticsEvent(event)
+    );
   }
 };

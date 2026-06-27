@@ -1,4 +1,6 @@
 import { dossierService } from "./dossierService";
+import { isSupabaseConfigured } from "./supabaseClient";
+import { supabaseStorageService } from "./supabaseStorageService";
 import type { ShareLink, ShareMode, SharedDossierResult, StartupDossier } from "../types";
 
 const randomToken = (seed: string) =>
@@ -73,6 +75,11 @@ export const shareService = {
   },
 
   async getSharedDossier(shareToken: string): Promise<SharedDossierResult | undefined> {
+    if (isSupabaseConfigured()) {
+      const shared = await supabaseStorageService.getSharedDossier(shareToken).catch(() => undefined);
+      if (shared) return shared;
+    }
+
     const dossiers = await dossierService.listDossiers();
     for (const dossier of dossiers) {
       const shareLink = dossier.shareLinks.find(
@@ -88,6 +95,11 @@ export const shareService = {
   },
 
   async recordView(shareToken: string): Promise<SharedDossierResult | undefined> {
+    if (isSupabaseConfigured()) {
+      const shared = await supabaseStorageService.recordShareView(shareToken).catch(() => undefined);
+      if (shared) return shared;
+    }
+
     const result = await this.getSharedDossier(shareToken);
     if (!result) return undefined;
 
