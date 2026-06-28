@@ -116,11 +116,11 @@ export default function ScanPage() {
             <Button type="submit" fullWidth>
               Scan for Business
             </Button>
-            <div className="rounded-md border border-white/10 bg-slate-950/35">
+            <div className="rounded-md border border-white/16 bg-slate-950/45 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <button
                 type="button"
                 onClick={() => setShowOptionalContext((open) => !open)}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-100"
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-extrabold text-slate-100"
               >
                 <span>Optional: add context</span>
                 <ChevronDown
@@ -129,7 +129,7 @@ export default function ScanPage() {
                 />
               </button>
               {showOptionalContext ? (
-                <div className="grid gap-4 border-t border-white/10 p-4 md:grid-cols-2">
+                <div className="grid gap-4 border-t border-white/16 p-4 md:grid-cols-2">
                   <FieldLabel label="Where did you notice this?">
                     <Select value={whereNoticed} onChange={(event) => setWhereNoticed(event.target.value as WhereNoticed | "")}>
                       <option value="">Choose if useful</option>
@@ -167,7 +167,7 @@ export default function ScanPage() {
           </form>
         </Card>
 
-        <div className="mt-6 rounded-lg border border-white/10 bg-white/[0.05] p-4">
+        <div className="mt-6 rounded-lg border border-white/16 bg-white/[0.07] p-4 shadow-premium ring-1 ring-white/[0.04]">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-sm font-bold text-white">Try example</h2>
             <span className="text-xs text-slate-400">Tap one, then scan it.</span>

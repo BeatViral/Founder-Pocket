@@ -54,9 +54,9 @@ export function BusinessAngleCard({
 
 function Metric({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-md bg-slate-100 p-2 text-center">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className="text-sm font-bold text-slate-950">{value}/10</div>
+    <div className="rounded-md border border-slate-200 bg-slate-100 p-2 text-center shadow-sm">
+      <div className="text-xs font-bold text-slate-500">{label}</div>
+      <div className="text-sm font-black text-slate-950">{value}/10</div>
     </div>
   );
 }

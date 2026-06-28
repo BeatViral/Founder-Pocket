@@ -16,7 +16,9 @@ export default {
       },
       boxShadow: {
         glow: "0 24px 90px rgba(56, 189, 248, 0.18)",
-        panel: "0 22px 70px rgba(2, 6, 23, 0.34)"
+        panel: "0 22px 70px rgba(2, 6, 23, 0.34)",
+        premium: "0 28px 90px rgba(2, 6, 23, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.08)",
+        "premium-light": "0 22px 58px rgba(15, 23, 42, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.92)"
       },
       fontFamily: {
         sans: [

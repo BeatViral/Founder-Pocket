@@ -24,6 +24,9 @@ body {
   background:
     linear-gradient(180deg, rgba(13, 17, 23, 0.96), rgba(13, 17, 23, 1)),
     radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 32rem);
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 button,
@@ -31,6 +34,22 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+h1,
+h2,
+h3,
+.tracking-tight,
+.tracking-wide,
+.tracking-wider,
+.tracking-widest {
+  letter-spacing: 0 !important;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
 }
 
 ::selection {

@@ -211,8 +211,8 @@ export default function DashboardPage() {
 function Metric({ title, value }: { title: string; value: string | number }) {
   return (
     <Card className="p-4">
-      <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{title}</div>
-      <div className="mt-2 text-2xl font-black">{value}</div>
+      <div className="text-xs font-black uppercase text-slate-400">{title}</div>
+      <div className="mt-2 text-3xl font-black">{value}</div>
     </Card>
   );
 }
@@ -222,8 +222,8 @@ function SectionCard({ icon, title, children }: { icon: ReactNode; title: string
     <section className="xl:col-span-2">
       <Card className="p-5">
         <div className="mb-4 flex items-center gap-3">
-          <span className="text-signal">{icon}</span>
-          <h2 className="text-xl font-bold">{title}</h2>
+          <span className="grid h-9 w-9 place-items-center rounded-md border border-cyan-300/30 bg-cyan-300/10 text-signal">{icon}</span>
+          <h2 className="text-xl font-black">{title}</h2>
         </div>
         {children}
       </Card>
@@ -233,7 +233,7 @@ function SectionCard({ icon, title, children }: { icon: ReactNode; title: string
 
 function Row({ children }: { children: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-white/10 bg-white/[0.05] p-4">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-white/16 bg-white/[0.07] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
       {children}
     </div>
   );
@@ -241,16 +241,16 @@ function Row({ children }: { children: ReactNode }) {
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-white/10 bg-white/[0.05] p-3">
-      <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</div>
-      <div className="mt-1 text-sm leading-6 text-slate-200">{value}</div>
+    <div className="rounded-md border border-white/16 bg-white/[0.07] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <div className="text-xs font-black uppercase text-slate-400">{label}</div>
+      <div className="mt-1 text-sm font-semibold leading-6 text-slate-100">{value}</div>
     </div>
   );
 }
 
 function EmptyState({ label }: { label: string }) {
   return (
-    <div className="rounded-md border border-white/10 bg-white/[0.04] p-4 text-sm text-slate-400">
+    <div className="rounded-md border border-white/16 bg-white/[0.06] p-4 text-sm font-semibold text-slate-300">
       {label}
     </div>
   );

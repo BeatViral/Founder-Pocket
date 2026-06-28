@@ -8,9 +8,9 @@ type CardProps = HTMLAttributes<HTMLDivElement> & {
 
 export function Card({ className, children, tone = "glass", ...props }: CardProps) {
   const tones = {
-    dark: "border-white/10 bg-coal text-white shadow-panel",
-    light: "border-slate-200 bg-white text-slate-950 shadow-sm",
-    glass: "border-white/10 bg-white/[0.06] text-white shadow-panel backdrop-blur"
+    dark: "border-white/16 bg-coal text-white shadow-premium ring-1 ring-white/[0.04]",
+    light: "border-slate-300/90 bg-white text-slate-950 shadow-premium-light ring-1 ring-slate-950/[0.03]",
+    glass: "border-white/16 bg-white/[0.075] text-white shadow-premium backdrop-blur-xl ring-1 ring-white/[0.04]"
   };
 
   return (

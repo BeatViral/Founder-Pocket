@@ -11,15 +11,15 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "bg-signal text-slate-950 hover:bg-cyan-300 shadow-glow border-transparent",
+    "border-cyan-200/70 bg-signal text-slate-950 shadow-[0_16px_46px_rgba(56,189,248,0.22)] hover:bg-cyan-300 hover:shadow-[0_18px_58px_rgba(56,189,248,0.3)]",
   secondary:
-    "bg-white/10 text-white hover:bg-white/15 border-white/15",
+    "border-white/18 bg-white/[0.105] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] hover:border-white/28 hover:bg-white/[0.15]",
   ghost:
-    "bg-transparent text-slate-200 hover:bg-white/10 border-transparent",
+    "border-transparent bg-transparent text-slate-200 hover:bg-white/10",
   quiet:
-    "bg-slate-100 text-slate-900 hover:bg-white border-slate-200",
+    "border-slate-300 bg-slate-100 text-slate-950 shadow-sm hover:bg-white hover:border-slate-400",
   danger:
-    "bg-rose-500/14 text-rose-100 hover:bg-rose-500/22 border-rose-300/20"
+    "border-rose-300/28 bg-rose-500/16 text-rose-100 hover:bg-rose-500/24"
 };
 
 export function Button({
@@ -35,7 +35,7 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex min-h-10 items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-4 py-2.5 text-sm font-extrabold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50",
         variants[variant],
         fullWidth && "w-full",
         className
